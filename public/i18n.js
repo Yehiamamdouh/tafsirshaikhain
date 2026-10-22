@@ -1,6 +1,6 @@
 // Interface language: translates chrome only (never the imams' Arabic texts).
 (function(){
-  const CHROME = 'header.top,.controls,.surah-head,.grid-legend,.imam-head,.none,.nuq h3,.nq-head .st,.cite,.drawer-btn,.nav,.about-link,.site-foot,#status,.gres-h,.more,main.ab,.toast,.drawer-tools,.tr-label';
+  const CHROME = 'header.top,.controls,.surah-head,.grid-legend,.imam-head,.none,.nuq h3,.nq-head .st,.cite,.drawer-btn,.nav,.about-link,.site-foot,#status,.gres-h,.more,main.ab,.toast,.drawer-tools,.tr-label,details.intro';
   const qs = new URLSearchParams(location.search);
   let lang = qs.get('lang') || (function(){ try { return localStorage.getItem('lang'); } catch(e){ return null; } })() || 'ar';
   const I = window.I18N = { lang, dict: null, meta: null, ready: null, t: s => (I.dict && I.dict[s]) || s, onChange: [] };
@@ -33,7 +33,9 @@
     const meta = I.meta || (I.meta = await fetch('/tr/langs.json').then(r => r.json()).catch(() => ({})));
     I.dict = await fetch('/i18n/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
     subs = keysBySize();
-    const ab = document.querySelector('main.ab'); if (ab && meta[l]) ab.setAttribute('dir', meta[l].dir);
+    // translated prose reads in its own direction; Arabic verse/quote areas keep RTL
+    const dir = (meta[l] && meta[l].dir) || 'ltr';
+    document.querySelectorAll('main.ab, header.top h1, header.top .lede, details.intro, .about-link, .site-foot, .crumbs, .gres-h').forEach(e => { e.setAttribute('dir', dir); e.setAttribute('lang', l); });
     document.documentElement.setAttribute('lang', l);
     sweep(); observe();
     I.onChange.forEach(f => { try { f(l); } catch(e){} });
