@@ -84,3 +84,11 @@ section.imam,.surah,.controls,.drawer,.ab section{border-color:var(--line)!impor
 .sp .rel{display:flex;flex-wrap:wrap;gap:6px}.sp .rel a,.sp .rel span{padding:4px 10px;border-radius:99px;border:1px solid var(--gold-soft);font-size:15px;color:var(--lapis);text-decoration:none}
 .sp .rel span{color:var(--muted)} .sp cite a{color:inherit}
 .sp .vrow.bk b{flex:1 1 auto;white-space:normal;min-width:0}.sp .vrow.bk span{flex:none;font-family:inherit;font-size:14px}
+/* collapsible intro to the two shaykhs inside the app header */
+details.intro{margin-top:6px}
+details.intro>summary{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--lapis);padding:6px 14px;border:1px solid var(--gold-soft);border-radius:99px;background:var(--sheet);list-style:none}
+details.intro>summary::-webkit-details-marker{display:none}
+details.intro>summary::after{content:"▾";font-size:12px;color:var(--gold)}
+details.intro[open]>summary::after{content:"▴"}
+details.intro .shaykhs{margin-top:12px}
+.surah-pick{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}.surah-pick select{min-width:0;width:100%}.surah-pick button{white-space:nowrap}
