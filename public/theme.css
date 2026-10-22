@@ -77,3 +77,10 @@ section.imam,.surah,.controls,.drawer,.ab section{border-color:var(--line)!impor
 .sp .pn{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .sp .vl{display:flex;flex-wrap:wrap;gap:6px}
 .sp .vl a{min-width:44px;text-align:center;padding:6px 8px;border-radius:8px;background:var(--sheet);border:1px solid var(--gold);color:var(--ink);text-decoration:none;font-variant-numeric:tabular-nums}
+.sp .vrows{display:grid;gap:6px}
+.sp .vrow{display:flex;gap:10px;align-items:baseline;padding:8px 12px;border-radius:10px;background:var(--paper);border:1px solid var(--line);color:var(--ink);text-decoration:none;min-width:0}
+.sp .vrow:hover{border-color:var(--gold)} .sp .vrow b{flex:none;white-space:nowrap;color:var(--lapis);font-variant-numeric:tabular-nums}
+.sp .vrow span{font-family:"Amiri Quran","Amiri",serif;font-size:17px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sp .rel{display:flex;flex-wrap:wrap;gap:6px}.sp .rel a,.sp .rel span{padding:4px 10px;border-radius:99px;border:1px solid var(--gold-soft);font-size:15px;color:var(--lapis);text-decoration:none}
+.sp .rel span{color:var(--muted)} .sp cite a{color:inherit}
+.sp .vrow.bk b{flex:1 1 auto;white-space:normal;min-width:0}.sp .vrow.bk span{flex:none;font-family:inherit;font-size:14px}
