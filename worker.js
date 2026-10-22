@@ -14,7 +14,6 @@ const recent = new Map(); // soft per-isolate rate limit
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (url.pathname === "/api/envcheck") return json({ keys: Object.keys(env).sort() }); // names only, no values (temporary)
     if (url.pathname !== "/api/feedback") return env.ASSETS.fetch(req);
     if (req.method !== "POST") return json({ error: "method" }, 405);
 
@@ -33,9 +32,9 @@ export default {
 
     const ts = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
-      body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: get("cf-turnstile-response"), remoteip: ip }),
+      body: new URLSearchParams({ secret: env.TURNSTILE_SECRET || env.SecretKey, response: get("cf-turnstile-response"), remoteip: ip }),
     }).then(r => r.json()).catch(() => ({}));
-    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." + (env.TURNSTILE_SECRET ? "" : " [no secret]") + " (" + (ts["error-codes"] || []).join(",") + ")" }, 400);
+    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." + ((env.TURNSTILE_SECRET || env.SecretKey) ? "" : " [no secret]") + " (" + (ts["error-codes"] || []).join(",") + ")" }, 400);
 
     const email = get("email").slice(0, 120);
     const text = [
