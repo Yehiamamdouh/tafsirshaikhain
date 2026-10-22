@@ -24,7 +24,15 @@
 .gres-t{font-family:var(--f-read,serif);font-size:17px;line-height:1.9;overflow-wrap:anywhere}
 .site-foot{max-width:1100px;margin:24px auto 0;padding:16px;border-top:1px solid var(--line,#d9dee6);display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;font-size:13px;color:var(--muted,#5b6676)}
 .site-foot a{color:inherit}
+.tr-verse{display:grid;gap:4px;background:var(--saffron-soft,#f6ecdc);border-radius:10px;padding:10px 14px}
+.tr-label{font-size:12px;color:var(--muted,#5b6676)}
+.tr-text{margin:0;font-size:16.5px;line-height:1.8}
+.tr-fn{margin:0;font-size:14px;line-height:1.7;color:var(--muted,#5b6676);white-space:pre-line}
+.tr-credit{font-size:12px;color:var(--muted,#5b6676)}
+.tr-sum{margin:4px 0 0;font-size:15.5px;line-height:1.8;color:var(--muted,#5b6676);border-inline-start:3px solid var(--line,#d9dee6);padding-inline-start:10px}
+#langsel{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line,#d9dee6);border-radius:6px;background:var(--sheet,#fff);color:var(--ink,#18212e)}
 </style>
+<script src="i18n.js"></script>
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -640,6 +648,52 @@ if (dl) dl.addEventListener('click', async () => {
   dl.textContent = 'حُفظ المصحف كله للقراءة دون إنترنت';
 });
 updatePh();
+
+// ===== translations: verse meaning (QuranEnc) + approximate translation of summaries =====
+const TRV = {}, TRS = {};
+function fnv(s){ s = s.replace(/\s+/g, ' ').trim(); let h = 0x811c9dc5; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); }
+function curLang(){ return (window.I18N && I18N.lang) || 'ar'; }
+async function ensureTr(l, s){
+  const kv = l + s;
+  if (!TRV[kv]) TRV[kv] = await fetch('tr/' + l + '/' + s + '.json').then(r => r.json()).catch(() => []);
+  if (!TRS[l]) TRS[l] = await fetch('st/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+}
+function trBlock(text, cls, l){
+  const p = document.createElement('p'); p.className = cls; p.setAttribute('dir', (I18N.meta && I18N.meta[l] && I18N.meta[l].dir) || 'auto'); p.setAttribute('lang', l);
+  p.textContent = text; return p;
+}
+const _render2 = render;
+render = function(){
+  _render2();
+  const l = curLang(); if (l === 'ar' || state.q) return;
+  const s = state.s, v = state.ay;
+  if (!TRV[l + s] || !TRS[l]){ ensureTr(l, s).then(() => { if (state.s === s && curLang() === l) render(); }); return; }
+  const m = (I18N.meta || {})[l] || {};
+  const vt = document.querySelector('.verse-title');
+  if (vt && v && TRV[l + s][v - 1]){
+    const [t, fn] = TRV[l + s][v - 1];
+    const box = document.createElement('div'); box.className = 'tr-verse';
+    box.innerHTML = '<span class="tr-label">ترجمة معاني الآية</span>';
+    box.appendChild(trBlock(t, 'tr-text', l));
+    if (fn){ const d = document.createElement('details'); d.innerHTML = '<summary>…</summary>'; d.appendChild(trBlock(fn, 'tr-fn', l)); box.appendChild(d); }
+    const cr = document.createElement('a'); cr.className = 'tr-credit'; cr.href = m.url || 'https://quranenc.com'; cr.target = '_blank'; cr.rel = 'noopener';
+    cr.textContent = (m.title || '') + ' — v' + (m.version || '') + ' · QuranEnc.com'; cr.setAttribute('dir', 'ltr');
+    box.appendChild(cr);
+    vt.after(box);
+  }
+  const map = TRS[l] || {};
+  let any = false;
+  document.querySelectorAll('.pt .quote, .nq-q').forEach(q => {
+    const t = q.textContent.replace(/^«|»$/g, '');
+    const tr = map[fnv(t)]; if (!tr) return;
+    any = true; q.after(trBlock(tr, 'tr-sum', l));
+  });
+  if (any && !document.querySelector('.tr-note')){
+    const n = document.createElement('p'); n.className = 'tr-note tr-label'; n.textContent = 'ترجمة تقريبية للمختصر — النص العربي هو المرجع';
+    const first = document.querySelector('.imam'); if (first) first.before(n);
+  }
+};
+if (window.I18N) I18N.onChange.push(() => render());
 
 })();
 </script>
