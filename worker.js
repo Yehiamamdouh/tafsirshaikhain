@@ -55,7 +55,7 @@ export default {
     ].join("\r\n");
     try {
       await env.MAIL.send(new EmailMessage(env.FEEDBACK_FROM, env.FEEDBACK_TO, raw));
-    } catch (e) { return json({ error: "تعذّر الإرسال الآن." }, 500); }
+    } catch (e) { return json({ error: "تعذّر الإرسال الآن. (" + String(e && e.message || e).slice(0, 200) + (env.FEEDBACK_TO ? "" : " | no FEEDBACK_TO") + ")" }, 500); }
     hits.push(now); recent.set(ip, hits);
     return json({ ok: true });
   },
