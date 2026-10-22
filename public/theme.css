@@ -26,8 +26,8 @@ section.imam,.surah,.controls,.drawer,.ab section{border-color:var(--line)!impor
 
 /* ---------- home ---------- */
 .home{max-width:1080px;margin:0 auto;display:grid;gap:28px;padding:8px 0 24px}
-.hero{text-align:center;display:grid;gap:14px;justify-items:center;padding:34px 18px 26px;background:var(--sheet);
-  border:1px solid var(--gold-soft);border-radius:22px;position:relative;overflow:hidden}
+.hero{text-align:center;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;justify-items:center;padding:34px 18px 26px;background:var(--sheet);
+  border:1px solid var(--gold-soft);border-radius:22px;position:relative}
 .hero::before,.hero::after{content:"";position:absolute;inset:10px;border:1px solid var(--gold-soft);border-radius:16px;pointer-events:none}
 .hero::after{inset:16px;border-style:dashed;opacity:.6}
 .hero .bism{font-family:"Amiri Quran","Amiri",serif;font-size:22px;color:var(--gold)}
@@ -37,10 +37,10 @@ section.imam,.surah,.controls,.drawer,.ab section{border-color:var(--line)!impor
 .btn{display:inline-block;font:inherit;font-size:16px;padding:11px 22px;border-radius:999px;text-decoration:none;cursor:pointer;border:1px solid var(--lapis)}
 .btn.pri{background:var(--lapis);color:#fffdf7}
 .btn.sec{background:transparent;color:var(--lapis)}
-.hsearch{display:flex;gap:8px;width:min(560px,100%);position:relative;z-index:1}
+.hsearch{display:flex;gap:8px;width:min(560px,100%);position:relative;z-index:5}
 .hsearch input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 16px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
 .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;position:relative;z-index:1}
-.stat{min-width:120px;padding:8px 14px;border-radius:12px;background:var(--gold-soft)}
+.stat{flex:1 1 40%;max-width:200px;min-width:120px;padding:8px 14px;border-radius:12px;background:var(--gold-soft)}
 .stat b{display:block;font-size:22px;color:var(--lapis);font-variant-numeric:tabular-nums}
 .stat span{font-size:13px;color:var(--muted)}
 .shaykhs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
