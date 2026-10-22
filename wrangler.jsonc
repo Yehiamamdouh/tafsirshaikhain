@@ -3,6 +3,10 @@
   "name": "tafsirshaikhain",
   "main": "worker.js",
   "compatibility_date": "2025-09-01",
+  "routes": [
+    { "pattern": "tafsirshaikhain.com", "custom_domain": true },
+    { "pattern": "www.tafsirshaikhain.com", "custom_domain": true }
+  ],
   "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
   // Feedback e-mail: destination is NOT stored here; it is the FEEDBACK_TO secret
   "send_email": [{ "name": "MAIL" }],
