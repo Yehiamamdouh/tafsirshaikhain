@@ -144,7 +144,7 @@ for root,_,files in os.walk(P):
     if rel.split(os.sep)[0] not in ('ayah','surah'): continue
     for f in files:
         p=os.path.join(root,f); tail=f'{rel}/{f}'.replace(os.sep,'/'); h=open(p).read()
-        if 'hreflang' not in h: open(p,'w').write(h.replace('</head>',alts(tail)+'</head>',1))
+        if 'rel="alternate" hreflang' not in h: open(p,'w').write(h.replace('</head>',alts(tail)+'</head>',1))
 import datetime
 today=datetime.date.today().isoformat()
 def smap(name,us):
@@ -156,7 +156,7 @@ open(P+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<sitem
     +''.join(f'<sitemap><loc>{BASE}/{n}</loc><lastmod>{today}</lastmod></sitemap>\n' for n in ['sitemap-ar.xml']+[f'sitemap-{l}.xml' for l in L])+'</sitemapindex>\n')
 # Arabic home links to the language homes too
 h=open(P+'/index.html').read()
-if 'hreflang' not in h: open(P+'/index.html','w').write(h.replace('</head>',alts('')+'</head>',1))
+if 'rel="alternate" hreflang' not in h: open(P+'/index.html','w').write(h.replace('</head>',alts('')+'</head>',1))
 print('language pages',n,'total urls added',len(urls))
 rb=open(P+'/robots.txt').read()
 if '/lp/' not in rb: open(P+'/robots.txt','w').write(rb.replace('User-agent: *','User-agent: *\nDisallow: /lp/',1))
