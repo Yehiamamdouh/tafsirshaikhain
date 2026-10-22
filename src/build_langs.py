@@ -69,18 +69,36 @@ def crumbs(l,tail):
     s=int(m.group(2)); it.append((f"{t['surah']} {name(l,s)}",f'/{l}/surah/{s}.html'))
     if m.group(3): it.append((f"{t['verse']} {m.group(3)}",f'/{l}/{tail}'))
     return {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":BASE+u} for i,(n,u) in enumerate(it)]}
+LOC={'en':'en_US','ur':'ur_PK','id':'id_ID','tr':'tr_TR','fr':'fr_FR','bn':'bn_BD','ms':'ms_MY','fa':'fa_IR','ru':'ru_RU','sw':'sw_KE','ha':'ha_NG','es':'es_ES','de':'de_DE','zh':'zh_CN'}
+def switcher(l,path_tail):
+    o=[f'<a href="/{path_tail}" hreflang="ar" lang="ar" data-l="ar">العربية</a>']
+    o+=[(f'<b lang="{k}">{E(META[k]["name"])}</b>' if k==l else f'<a href="/{k}/{path_tail}" hreflang="{k}" lang="{k}" data-l="{k}">{E(META[k]["name"])}</a>') for k in L]
+    return '<nav class="langs" aria-label="Language">🌐 '+' · '.join(o)+'</nav>\n'
+def ld_extra(l,title,desc,path_tail):
+    t=L[l]; u=f'{BASE}/{l}/{path_tail}'
+    if not path_tail: return {"@context":"https://schema.org","@type":"WebSite","name":t['site'],"alternateName":"جامع تفسير الشيخين","url":u,"inLanguage":l,"description":t['tag']}
+    if path_tail.startswith('ayah/'):
+        return {"@context":"https://schema.org","@type":"Article","headline":title[:110],"description":desc,"inLanguage":l,"url":u,"mainEntityOfPage":u,
+                "image":BASE+"/og.png","author":[{"@type":"Person","name":t['IT']},{"@type":"Person","name":t['IQ']}],
+                "isPartOf":{"@type":"WebSite","name":t['site'],"url":f'{BASE}/{l}/'}}
+    return {"@context":"https://schema.org","@type":"CollectionPage","name":title,"inLanguage":l,"url":u}
 def page(l,title,desc,path_tail,body):
-    t=L[l]; LD=crumbs(l,path_tail)
+    t=L[l]; LD=crumbs(l,path_tail); X=ld_extra(l,title,desc,path_tail)
     return (f'<!doctype html>\n<html lang="{l}" dir="{t["dir"]}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
             f'<title>{E(title)}</title>\n<meta name="description" content="{E(desc)}">\n<link rel="canonical" href="{BASE}/{l}/{path_tail}">\n{alts(path_tail)}'
-            f'<meta property="og:title" content="{E(title)}">\n<meta property="og:description" content="{E(desc)}">\n<meta name="theme-color" content="#1f4d3a">\n<meta property="og:image" content="https://tafsirshaikhain.com/og.png">\n<meta name="twitter:card" content="summary_large_image">\n'
+            f'<meta property="og:title" content="{E(title)}">\n<meta property="og:description" content="{E(desc)}">\n<meta property="og:url" content="{BASE}/{l}/{path_tail}">\n'
+            f'<meta property="og:site_name" content="{E(t["site"])}">\n<meta property="og:locale" content="{LOC[l]}">\n<meta property="og:type" content="{"article" if path_tail.startswith("ayah/") else "website"}">\n'
+            f'<meta name="theme-color" content="#1f4d3a">\n<meta property="og:image" content="https://tafsirshaikhain.com/og.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">\n'
+            '<link rel="manifest" href="/manifest.webmanifest">\n<link rel="apple-touch-icon" href="/icon-192.png">\n'
+            '<script type="application/ld+json">'+json.dumps(X,ensure_ascii=False)+'</script>\n'
             +(('<script type="application/ld+json">'+json.dumps(LD,ensure_ascii=False)+'</script>\n') if LD else '')+
             '<link rel="icon" href="/icon.svg" type="image/svg+xml">\n<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap">\n'
             '<link rel="stylesheet" href="/theme.css">\n<style>body{font-family:system-ui,"Segoe UI",sans-serif;color:var(--ink);padding:20px 16px 48px;line-height:1.6}'
-            '.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}</style>\n</head>\n<body>\n'
-            +body+f'<footer class="site-foot"><span>{E(t["site"])} · <a href="/{l}/">{E(t["home"])}</a> · <a href="/about.html">{E(t["about"])}</a> · <a href="/privacy.html">{E(t["privacy"])}</a></span>'
-            '<a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a></footer>\n</body>\n</html>\n')
+            '.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}.langs{max-width:1100px;margin:24px auto 0;font-size:14px;line-height:2;color:var(--muted)}.langs a{color:var(--lapis)}</style>\n</head>\n<body>\n'
+            +body+switcher(l,path_tail)+f'<footer class="site-foot"><span>{E(t["site"])} · <a href="/{l}/">{E(t["home"])}</a> · <a href="/about.html">{E(t["about"])}</a> · <a href="/privacy.html">{E(t["privacy"])}</a></span>'
+            '<a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a></footer>\n'
+            f'<script>try{{localStorage.setItem("lang","{l}")}}catch(e){{}}document.addEventListener("click",function(e){{var a=e.target.closest&&e.target.closest("[data-l]");if(a)try{{localStorage.setItem("lang",a.dataset.l)}}catch(x){{}}}})</script>\n</body>\n</html>\n')
 def ref(d,x):
     b=d['books'][x['b']]; return '«'+b['t']+'» '+(str(x['v'])+'/' if x.get('v') else '')+str(x['p'])
 urls=[]; n=0
@@ -127,8 +145,18 @@ for root,_,files in os.walk(P):
     for f in files:
         p=os.path.join(root,f); tail=f'{rel}/{f}'.replace(os.sep,'/'); h=open(p).read()
         if 'hreflang' not in h: open(p,'w').write(h.replace('</head>',alts(tail)+'</head>',1))
-sm=open(P+'/sitemap.xml').read().replace('</urlset>\n',''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in urls)+'</urlset>\n')
-open(P+'/sitemap.xml','w').write(sm)
+import datetime
+today=datetime.date.today().isoformat()
+def smap(name,us):
+    open(f'{P}/{name}','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in us)+'</urlset>\n')
+ar_urls=re.findall(r'<loc>'+re.escape(BASE)+r'(.*?)</loc>',open(P+'/sitemap.xml').read())
+smap('sitemap-ar.xml',ar_urls)
+for l in L: smap(f'sitemap-{l}.xml',[u for u in urls if u.startswith(f'/{l}/')])
+open(P+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    +''.join(f'<sitemap><loc>{BASE}/{n}</loc><lastmod>{today}</lastmod></sitemap>\n' for n in ['sitemap-ar.xml']+[f'sitemap-{l}.xml' for l in L])+'</sitemapindex>\n')
+# Arabic home links to the language homes too
+h=open(P+'/index.html').read()
+if 'hreflang' not in h: open(P+'/index.html','w').write(h.replace('</head>',alts('')+'</head>',1))
 print('language pages',n,'total urls added',len(urls))
 rb=open(P+'/robots.txt').read()
 if '/lp/' not in rb: open(P+'/robots.txt','w').write(rb.replace('User-agent: *','User-agent: *\nDisallow: /lp/',1))
