@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>جامع تفسير الشيخين — معاني القرآن بكلام ابن تيمية وابن القيم</title>
-<meta name="description" content="جامع تفسير الشيخين: معاني القرآن بكلام شيخ الإسلام ابن تيمية والإمام ابن القيم، مختصر لكل آية بنص كلامهما مع الإحالة، والنصوص الكاملة، وما نقلاه عن السلف، وبحث في المصحف كله.">
+<title>عن المشروع — جامع تفسير الشيخين</title>
+<meta name="description" content="الدافع ومنهج العمل والمصادر والقيمة المضافة لجامع تفسير الشيخين، ونموذج إرسال التصويبات.">
+<link rel="canonical" href="https://tafsirshaikhain.com/about.html">
 <meta name="theme-color" content="#1f4f8f">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta property="og:title" content="جامع تفسير الشيخين">
-<meta property="og:description" content="معاني القرآن بكلام ابن تيمية وابن القيم — بنص كلامهما، مرتبًا على الآيات.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:title" content="عن المشروع — جامع تفسير الشيخين">
+<meta property="og:description" content="الدافع ومنهج العمل والمصادر والقيمة المضافة لجامع تفسير الشيخين، ونموذج إرسال التصويبات.">
+<meta property="og:url" content="https://tafsirshaikhain.com/about.html">
+<meta property="og:site_name" content="جامع تفسير الشيخين">
+<meta property="og:locale" content="ar_AR">
 <meta property="og:type" content="website">
 <style>
 .about-link{font-size:14px;color:var(--muted,#5b6676);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
@@ -32,7 +36,8 @@
 .tr-sum{margin:4px 0 0;font-size:15.5px;line-height:1.8;color:var(--muted,#5b6676);border-inline-start:3px solid var(--line,#d9dee6);padding-inline-start:10px}
 #langsel{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line,#d9dee6);border-radius:6px;background:var(--sheet,#fff);color:var(--ink,#18212e)}
 </style>
-<script src="i18n.js"></script>
+<script src="/i18n.js"></script>
+
 </head>
 <body>
 <style>
@@ -174,7 +179,7 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 .back{font-size:14px}
 </style>
 <main class="ab">
-  <p class="back"><a href="index.html">← الرجوع إلى التفسير</a></p>
+  <p class="back"><a href="/tafsir.html">← الرجوع إلى التفسير</a></p>
   <header>
     <h1>جامع تفسير الشيخين</h1>
     <p class="lede">معاني القرآن بكلام شيخ الإسلام ابن تيمية وتلميذه الإمام ابن القيم</p>
@@ -254,7 +259,7 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 <script>
 (function(){
   const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-  fetch('stats.json').then(r => r.json()).then(s => {
+  fetch('/stats.json').then(r => r.json()).then(s => {
     const items = [[s.ayat,'آية لها مختصر'],[s.IT,'مختصر لابن تيمية'],[s.IQ,'مختصر لابن القيم'],[s.nuq,'نقلًا عن السلف والمفسرين'],[s.booksIT + s.booksIQ,'كتابًا مصدرًا']];
     document.getElementById('nums').innerHTML = items.map(([n,l]) => '<div class="num"><b>' + AR(n.toLocaleString('en')) + '</b><span>' + l + '</span></div>').join('');
   }).catch(() => {});
@@ -274,8 +279,9 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
   });
 })();
 </script>
+<link rel="stylesheet" href="/theme.css">
 <footer class="site-foot">
-  <span>جامع تفسير الشيخين · <a href="index.html">الرئيسية</a> · <a href="about.html">عن المشروع</a> · <a href="about.html#feedback">أرسل تصويبًا</a></span>
+  <span>جامع تفسير الشيخين · <a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/about.html">عن المشروع</a> · <a href="/about.html#feedback">أرسل تصويبًا</a></span>
   <a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a>
 </footer>
 

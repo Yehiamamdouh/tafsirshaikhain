@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>جامع تفسير الشيخين — معاني القرآن بكلام ابن تيمية وابن القيم</title>
-<meta name="description" content="جامع تفسير الشيخين: معاني القرآن بكلام شيخ الإسلام ابن تيمية والإمام ابن القيم، مختصر لكل آية بنص كلامهما مع الإحالة، والنصوص الكاملة، وما نقلاه عن السلف، وبحث في المصحف كله.">
+<title>جامع تفسير الشيخين — تفسير القرآن بكلام ابن تيمية وابن القيم</title>
+<meta name="description" content="جامع تفسير الشيخين: معاني القرآن الكريم بكلام شيخ الإسلام ابن تيمية والإمام ابن القيم، مختصر لكل آية بنص كلامهما مع الإحالة، والنصوص كاملة، وما نقلاه عن السلف، وبحث في المصحف كله.">
+<link rel="canonical" href="https://tafsirshaikhain.com/">
 <meta name="theme-color" content="#1f4f8f">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta property="og:title" content="جامع تفسير الشيخين">
-<meta property="og:description" content="معاني القرآن بكلام ابن تيمية وابن القيم — بنص كلامهما، مرتبًا على الآيات.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:title" content="جامع تفسير الشيخين — تفسير القرآن بكلام ابن تيمية وابن القيم">
+<meta property="og:description" content="جامع تفسير الشيخين: معاني القرآن الكريم بكلام شيخ الإسلام ابن تيمية والإمام ابن القيم، مختصر لكل آية بنص كلامهما مع الإحالة، والنصوص كاملة، وما نقلاه عن السلف، وبحث في المصحف كله.">
+<meta property="og:url" content="https://tafsirshaikhain.com/">
+<meta property="og:site_name" content="جامع تفسير الشيخين">
+<meta property="og:locale" content="ar_AR">
 <meta property="og:type" content="website">
 <style>
 .about-link{font-size:14px;color:var(--muted,#5b6676);display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
@@ -32,12 +36,10 @@
 .tr-sum{margin:4px 0 0;font-size:15.5px;line-height:1.8;color:var(--muted,#5b6676);border-inline-start:3px solid var(--line,#d9dee6);padding-inline-start:10px}
 #langsel{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line,#d9dee6);border-radius:6px;background:var(--sheet,#fff);color:var(--ink,#18212e)}
 </style>
-<script src="i18n.js"></script>
+<script src="/i18n.js"></script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "جامع تفسير الشيخين", "url": "https://tafsirshaikhain.com/", "inLanguage": "ar", "potentialAction": {"@type": "SearchAction", "target": "https://tafsirshaikhain.com/tafsir.html?q={q}", "query-input": "required name=q"}}</script>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
 <style>
 /* Layout: a reading desk — the surah is the index; for each verse, each imam has his own short sheet, with a drawer of full texts beneath it. */
 :root{
@@ -155,550 +157,50 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 .toast span{background:var(--ink);color:var(--paper);padding:7px 14px;border-radius:99px;font-size:13px}
 @media (max-width:520px){.quote{font-size:17px}.text{font-size:16.5px}}
 @media (prefers-reduced-motion:no-preference){.drawer,.card{animation:in .18s ease-out both}@keyframes in{from{transform:translateY(3px)}to{transform:none}}}
-</style>
-<style>
-/* additions for multi-surah navigation */
-.surah-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.surah-pick select{font:inherit;font-family:var(--f-display);font-size:18px;padding:7px 14px;border-radius:12px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);min-width:min(260px,100%);flex:1 1 220px;max-width:340px}
-.surah-pick button{font:inherit;font-family:var(--f-ui);font-size:14px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
-.surah-pick button:disabled{opacity:.4;cursor:default}
-.surah-tabs{display:flex;gap:8px;flex-wrap:wrap}
-.surah-tabs button{font:inherit;font-family:var(--f-display);font-size:17px;padding:6px 16px;border-radius:99px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
-.surah-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;padding:12px 16px}
-.grid button{font:inherit;font-size:13.5px;font-variant-numeric:tabular-nums;padding:6px 0;border-radius:6px;border:1px solid var(--line);background:var(--sheet);color:var(--muted);cursor:pointer;position:relative}
-.grid button.has{color:var(--ink);font-weight:600}
-.grid button.sum::after{content:"";position:absolute;top:4px;inset-inline-start:4px;width:5px;height:5px;border-radius:50%;background:var(--saffron)}
-.grid button[aria-pressed="true"]{background:var(--lapis-soft);border-color:var(--lapis);color:var(--lapis)}
-.grid-legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:0 16px 12px;font-size:12.5px;color:var(--muted)}
-.grid-legend i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--saffron);margin-inline-end:6px;vertical-align:middle}
-.nav{display:flex;justify-content:space-between;gap:8px}
-.nav button{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
-.nav button:disabled{opacity:.4;cursor:default}
-.loading{padding:24px;text-align:center;color:var(--muted)}
-.note{font-size:12.5px;color:var(--muted)}
-:root{--ok:#2f6b3f;--ok-soft:#e5f1e8;--no:#9b2c2c;--no-soft:#f7e4e4}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}}
-:root[data-theme="dark"]{--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}
-.nuq{border-top:1px dashed var(--line);padding:10px 16px 12px;display:grid;gap:8px}
-.nuq h3{font-family:var(--f-display);font-weight:500;font-size:15.5px;margin:0;color:var(--muted)}
-.nq{display:grid;gap:3px;padding:6px 0;border-bottom:1px dotted var(--line);min-width:0}
-.nq:last-child{border-bottom:0}
-.nq-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
-.nq-who{font-weight:600;font-size:14px}
-.st{font-size:12px;padding:0 8px;border-radius:99px;background:var(--lapis-soft);color:var(--lapis)}
-.st.ok{background:var(--ok-soft);color:var(--ok)} .st.no{background:var(--no-soft);color:var(--no)}
-.nq-q{font-family:var(--f-read);font-size:17px;line-height:1.95;margin:0;max-width:65ch;overflow-wrap:anywhere}
-.nq-r{font-family:var(--f-read);font-size:15.5px;line-height:1.9;margin:0;max-width:65ch;color:var(--muted);overflow-wrap:anywhere}
-.nq-r b{font-family:var(--f-ui);font-weight:600;font-size:13px;color:var(--ink)}
-</style>
-
-<div class="wrap">
-  <header class="top">
+</style><script>if (/^#s\d{1,3}a\d{1,3}$/.test(location.hash)) location.replace('tafsir.html' + location.hash);</script>
+<main class="home">
+  <section class="hero">
+    <div class="bism">بسم الله الرحمن الرحيم</div>
     <h1>جامع تفسير الشيخين</h1>
-    <p class="lede">معاني القرآن بكلام شيخ الإسلام ابن تيمية وتلميذه ابن القيم: مختصر لكل آية بنص كلامهما، ثم النصوص كاملة لمن يذاكر أو يطلب الدقائق.</p>
-    <div class="surah-pick">
-      <button type="button" id="sprev">→ السابقة</button>
-      <select id="ssel" aria-label="اختر السورة"></select>
-      <button type="button" id="snext">التالية ←</button>
-    </div>
-  </header>
-
-  <section class="surah" aria-label="آيات السورة">
-    <div class="surah-head"><b id="sname">سورة الفاتحة</b><span id="shint">اختر آية</span></div>
-    <div id="ayat"></div>
+    <p>معاني القرآن الكريم بكلام شيخ الإسلام ابن تيمية وتلميذه الإمام ابن القيم، مجموعةً من كتبهما كلها، مرتبةً على الآيات، بنصّ كلامهما مع الإحالة إلى الكتاب والجزء والصفحة.</p>
+    <form class="hsearch" action="tafsir.html" onsubmit="event.preventDefault();var q=this.q.value.trim();location.href='tafsir.html'+(q?'?q='+encodeURIComponent(q):'');">
+      <input name="q" type="search" placeholder="ابحث في المختصرات والنقول… مثال: التوحيد، الكرسي" aria-label="بحث">
+      <button class="btn pri" type="submit">ابحث</button>
+    </form>
+    <div class="cta"><a class="btn pri" href="tafsir.html#s1a0">ابدأ من الفاتحة</a><a class="btn sec" href="#suras">فهرس السور</a><a class="btn sec" href="about.html">عن المشروع</a></div>
+    <div class="stats"><div class="stat"><b>١,٤٤٩</b><span>آية لها مختصر</span></div><div class="stat"><b>١,٧١٧</b><span>مختصرًا بنص كلامهما</span></div><div class="stat"><b>٨١٧</b><span>نقلًا عن السلف</span></div><div class="stat"><b>١٤٧</b><span>كتابًا مصدرًا</span></div></div>
   </section>
 
-  <div class="controls">
-    <div class="search"><input id="q" type="search" autocomplete="off" aria-label="بحث في نصوص السورة"></div>
-    <div class="row">
-      <div class="seg" role="group" aria-label="الإمام">
-        <button id="a-all" data-a="" aria-pressed="true">الشيخان</button><button id="a-IT" data-a="IT" aria-pressed="false">ابن تيمية</button><button id="a-IQ" data-a="IQ" aria-pressed="false">ابن القيم</button>
-      </div>
-      <span class="status" id="status" aria-live="polite"></span>
-    </div>
-  </div>
+  <section class="shaykhs" aria-label="التعريف بالشيخين">
+    <article class="shaykh">
+      <h2 class="orn">ابن تيمية</h2>
+      <div class="full">شيخ الإسلام تقي الدين أبو العباس أحمد بن عبد الحليم بن عبد السلام الحرّاني (٦٦١–٧٢٨هـ)</div>
+      <p>وُلد بحرّان، وانتقل به أهله صغيرًا إلى دمشق فنشأ بها، وبرع في التفسير والحديث والفقه والأصول والعقائد، حتى لُقّب بشيخ الإسلام. جاهد بلسانه وقلمه وسيفه، وامتُحن وسُجن مرارًا، وتوفي معتقلًا بقلعة دمشق.</p>
+      <p>لم يصنّف تفسيرًا كاملًا للقرآن، وإنما فسّر الآيات في ثنايا كتبه وفتاواه ورسائله، وكان منهجه تفسير القرآن بالقرآن، ثم بالسنة، ثم بأقوال الصحابة والتابعين، مع العناية باللغة ورد التأويلات المخالفة لها، وقد قعّد ذلك في «مقدمة في أصول التفسير».</p>
+      <ul><li>«مجموع الفتاوى» (وفيه مجلدات التفسير)</li><li>«درء تعارض العقل والنقل»، «منهاج السنة النبوية»</li><li>«الجواب الصحيح»، «تفسير آيات أشكلت»</li></ul>
+    </article>
+    <article class="shaykh">
+      <h2 class="orn">ابن القيم</h2>
+      <div class="full">الإمام شمس الدين أبو عبد الله محمد بن أبي بكر بن أيوب الزُّرعي الدمشقي (٦٩١–٧٥١هـ)</div>
+      <p>عُرف بابن قيّم الجوزية لأن أباه كان قيّمًا على المدرسة الجوزية بدمشق. لازم شيخ الإسلام ابن تيمية من سنة ٧١٢هـ حتى وفاته، وأخذ عنه علمه ومنهجه، وسُجن معه في القلعة، ثم صار من أبرز من نشر علمه وحرّره.</p>
+      <p>امتاز بحسن العرض وعمق النظر في أسرار الألفاظ وحِكَم التشريع وأعمال القلوب، وله في التفسير فصول بديعة في «بدائع الفوائد» و«التبيان في أقسام القرآن» و«مدارج السالكين» وغيرها.</p>
+      <ul><li>«زاد المعاد»، «إعلام الموقعين»</li><li>«مدارج السالكين»، «بدائع الفوائد»</li><li>«شفاء العليل»، «التبيان في أقسام القرآن»</li></ul>
+    </article>
+  </section>
 
-  <main id="main" class="wrap" style="gap:16px"><div class="loading">جارٍ تحميل النصوص…</div></main>
-  <p class="about-link"><a href="about.html">عن المشروع ومنهج العمل</a> · <a href="about.html#feedback">أرسل تصويبًا</a> · <button type="button" id="dlall" class="linkbtn">احفظ المصحف كله للقراءة دون إنترنت</button></p>
-</div>
-<div class="toast" id="toast" hidden><span></span></div>
+  <section class="feat" aria-label="ماذا تجد هنا">
+    <div><b>مختصر لكل آية</b><span>جمل منقولة بنصها من كلام كل إمام، لم يُغيَّر فيها حرف، تحت كل جملة موضعها.</span></div>
+    <div><b>النصوص كاملة</b><span>لمن أراد التوسع: كل ما قاله الإمامان في الآية من كتبهما.</span></div>
+    <div><b>ما نقلاه عن السلف</b><span>أقوال الصحابة والتابعين والمفسرين، مع موقف الإمام من كل قول.</span></div>
+    <div><b>بحث ومشاركة</b><span>بحث في المصحف كله، ورابط لكل آية، ويعمل دون إنترنت على الهاتف.</span></div>
+  </section>
 
-<script>
-(function(){
-const NAME = {IT:'ابن تيمية', IQ:'ابن القيم'};
-const FULL = {IT:'شيخ الإسلام ابن تيمية', IQ:'الإمام ابن القيم'};
-const SURAHS = {1:{name:'الفاتحة', file:'s1.json'}};
-const NAMES = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
-NAMES.forEach((name, k) => { const n = k + 1; if (n > 1) SURAHS[n] = {name, file:'s'+n+'.json', inc:'s'+n+'i.json', ctx:'c'+n+'.json'}; });
-const EXAMPLES = {1:'الاستعانة، المغضوب', 2:'الغيب، الأمثال، الكرسي', 3:'الشهادة، المحكم، التأويل', 4:'الشفاعة، الحسنة، السيئة', 5:'الولاية، الحكم، العقود', 6:'الأجل، التوحيد، الهدى', 7:'الميثاق، الاستواء، الزينة', 8:'الأنفال، الغنيمة، الاستجابة', 9:'التوبة، النفاق، الجزية'};
-const FATIHA_KEYS = [null, ['بسم الله الرحمن الرحيم','البسمله'], ['الحمد لله رب العالمين','الحمد'], ['الرحمن الرحيم','الرحمن'], ['مالك يوم الدين','ملك يوم الدين'], ['اياك نعبد','اياك نستعين'], ['اهدنا الصراط المستقيم','الصراط المستقيم'], ['انعمت عليهم','المغضوب عليهم','الضالين']];
-const SURAH_TERMS = ['الفاتحه','فاتحه الكتاب','ام القران','السبع المثاني'];
-const RANK = {MadarijSalikin:0, MajmucFatawa:0, BadaicFawaid:1, Salat:2, RisalaIlaAhadIkhwan:3};
-const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-
-// ---------- Arabic text helpers ----------
-const STRIP = /[ً-ْٰـ]/;
-function normChar(c){ if ('إأآٱ'.includes(c)) return 'ا'; if (c==='ى') return 'ي'; if (c==='ة') return 'ه'; if (c==='ؤ') return 'و'; if (c==='ئ') return 'ي'; return c; }
-function normMap(s){ let out='', map=[]; for (let i=0;i<s.length;i++){ const c=s[i]; if (STRIP.test(c)) continue; out+=normChar(c); map.push(i); } return {out, map}; }
-function norm(s){ return normMap(s).out; }
-function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function highlight(text, terms){
-  const {out, map} = normMap(text);
-  const ranges = [];
-  for (const t of terms){ if (!t) continue; let i = out.indexOf(t);
-    while (i !== -1){ ranges.push([map[i], map[i + t.length - 1] + 1]); i = out.indexOf(t, i + t.length); } }
-  const re = /\{[^{}]*\}/g; let m; const qs = [];
-  while ((m = re.exec(text))) qs.push([m.index, m.index + m[0].length]);
-  if (!ranges.length && !qs.length) return esc(text);
-  ranges.sort((a,b) => a[0]-b[0]);
-  const merged = [];
-  for (const r of ranges){ const last = merged[merged.length-1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push(r.slice()); }
-  const ev = [];
-  merged.forEach(([s,e]) => { ev.push([s,'m',1]); ev.push([e,'/m',0]); });
-  qs.forEach(([s,e]) => { ev.push([s,'q',2]); ev.push([e,'/q',-1]); });
-  ev.sort((a,b) => a[0]-b[0] || a[2]-b[2]);
-  let html = '', pos = 0, openQ = false;
-  for (const [p, tag] of ev){
-    html += esc(text.slice(pos, p)); pos = p;
-    if (tag === 'm'){ if (openQ) html += '</span>'; html += '<mark>'; if (openQ) html += '<span class="q">'; }
-    else if (tag === '/m'){ if (openQ) html += '</span>'; html += '</mark>'; if (openQ) html += '<span class="q">'; }
-    else if (tag === 'q'){ html += '<span class="q">'; openQ = true; }
-    else { html += '</span>'; openQ = false; }
-  }
-  return html + esc(text.slice(pos));
-}
-// words of a verse used for highlighting inside long passages
-function verseTerms(S, v){
-  if (S.surah === 1) return v ? FATIHA_KEYS[v] : SURAH_TERMS;
-  const w = norm(S.verses[v-1]).replace(/[^ء-ي ]/g,'').split(/\s+/).filter(Boolean);
-  return w.length > 4 ? [w.slice(0,4).join(' ')] : [w.join(' ')];
-}
-
-// ---------- data loading ----------
-const cache = {}, extra = {};
-async function load(s){
-  if (cache[s]) return cache[s];
-  const res = await fetch(SURAHS[s].file);
-  if (!res.ok) throw new Error('fetch ' + res.status);
-  const D = await res.json();
-  D.byId = new Map(D.recs.map(r => [r.id, r]));
-  cache[s] = D; return D;
-}
-async function loadExtra(s, key){
-  const k = s + key;
-  if (extra[k]) return extra[k];
-  const res = await fetch(SURAHS[s][key]); const j = await res.json();
-  extra[k] = j;
-  if (key === 'inc'){ const D = cache[s]; j.forEach(r => { r.inc = 1; D.byId.set(r.id, r); }); }
-  return j;
-}
-
-// ---------- state ----------
-const state = {s:1, ay:0, a:'', q:'', open:{IT:false,IQ:false}, inc:{IT:false,IQ:false}, shown:{IT:{c:20,s:20},IQ:{c:20,s:20}}, qshown:25};
-const main = document.getElementById('main'), status = document.getElementById('status');
-const qEl = document.getElementById('q');
-
-function resetVerseState(){ state.open={IT:false,IQ:false}; state.shown={IT:{c:20,s:20},IQ:{c:20,s:20}}; }
-
-async function go(s, v, scroll){
-  if (state.s !== s){ state.s = s; state.inc = {IT:false,IQ:false}; }
-  state.ay = v; resetVerseState();
-  if (state.q){ state.q=''; qEl.value=''; }
-  ssel.value = String(s); sprev.disabled = s === 1; snext.disabled = s === 114;
-  document.getElementById('sname').textContent = 'سورة ' + SURAHS[s].name;
-  qEl.placeholder = 'ابحث في نصوص سورة ' + SURAHS[s].name + '…' + (EXAMPLES[s] ? ' مثال: ' + EXAMPLES[s] : '');
-  try { history.replaceState(null, '', '#s' + s + 'a' + v); } catch(e){}
-  if (!cache[s]){ main.innerHTML = '<div class="loading">جارٍ تحميل نصوص سورة ' + SURAHS[s].name + '…</div>'; }
-  let S;
-  try { S = await load(s); } catch(e){ main.innerHTML = '<div class="empty">تعذّر تحميل النصوص. أعد تحميل الصفحة.</div>'; return; }
-  buildIndex(S);
-  render();
-  if (scroll) main.scrollIntoView({behavior: (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth', block:'start'});
-}
-
-// ---------- verse index ----------
-function buildIndex(S){
-  const box = document.getElementById('ayat'); box.innerHTML = '';
-  const hint = document.getElementById('shint');
-  if (S.surah === 1){
-    hint.textContent = 'اختر آية';
-    const labels = ['الكلام على السورة عامة'].concat(S.verses);
-    labels.forEach((txt, v) => {
-      const b = document.createElement('button');
-      b.className = 'ayah'; b.setAttribute('aria-pressed', String(v === state.ay));
-      b.innerHTML = '<span class="no">' + (v ? '﴿' + AR(v) + '﴾' : '') + '</span><span class="txt' + (v ? '' : ' plain') + '">' + esc(txt) + '</span>';
-      b.addEventListener('click', () => go(1, v, true));
-      box.appendChild(b);
-    });
-    return;
-  }
-  hint.textContent = AR(S.verses.length) + ' آية';
-  const has = new Set(), sum = new Set();
-  S.recs.forEach(r => r.ay.forEach(v => has.add(v)));
-  ['IT','IQ'].forEach(a => { Object.keys((S.summ||{})[a]||{}).forEach(v => sum.add(+v)); Object.keys((S.nuq||{})[a]||{}).forEach(v => sum.add(+v)); });
-  const g = document.createElement('div'); g.className = 'grid';
-  for (let v = 1; v <= S.verses.length; v++){
-    const b = document.createElement('button'); b.type = 'button';
-    b.textContent = AR(v);
-    b.className = (has.has(v) ? 'has' : '') + (sum.has(v) ? ' sum' : '');
-    b.setAttribute('aria-pressed', String(v === state.ay));
-    b.setAttribute('aria-label', 'الآية ' + v + (sum.has(v) ? '، لها مختصر' : ''));
-    b.addEventListener('click', () => go(S.surah, v, true));
-    g.appendChild(b);
-  }
-  box.appendChild(g);
-  box.insertAdjacentHTML('beforeend', '<div class="grid-legend"><span><i></i>لها مختصر أو نقول</span><span>الأرقام الداكنة: لها نصوص للمذاكرة</span></div>');
-}
-
-const ssel = document.getElementById('ssel'), sprev = document.getElementById('sprev'), snext = document.getElementById('snext');
-NAMES.forEach((name, k) => { const o = document.createElement('option'); o.value = String(k + 1); o.textContent = AR(k + 1) + ' · ' + name; ssel.appendChild(o); });
-const goSurah = s => go(s, s === 1 ? 0 : 1, false);
-ssel.addEventListener('change', () => goSurah(+ssel.value));
-sprev.addEventListener('click', () => { if (state.s > 1) goSurah(state.s - 1); });
-snext.addEventListener('click', () => { if (state.s < 114) goSurah(state.s + 1); });
-document.querySelectorAll('[data-a]').forEach(btn => btn.addEventListener('click', () => {
-  state.a = btn.dataset.a;
-  document.querySelectorAll('[data-a]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
-  render();
-}));
-let qTimer;
-qEl.addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim(); state.qshown = 25; render(); }, 200); });
-
-// ---------- rendering ----------
-function render(){
-  const S = cache[state.s]; if (!S) return;
-  main.innerHTML = '';
-  if (state.q) return renderSearch(S);
-  status.textContent = '';
-  const v = state.ay;
-  if (S.surah !== 1){
-    const nav = document.createElement('div'); nav.className = 'nav';
-    nav.innerHTML = '<button type="button" id="prev">→ الآية السابقة</button><button type="button" id="next">الآية التالية ←</button>';
-    nav.querySelector('#prev').disabled = v <= 1; nav.querySelector('#next').disabled = v >= S.verses.length;
-    nav.querySelector('#prev').addEventListener('click', () => go(S.surah, v-1, false));
-    nav.querySelector('#next').addEventListener('click', () => go(S.surah, v+1, false));
-    main.appendChild(nav);
-  }
-  const title = document.createElement('h2');
-  title.className = 'verse-title' + (v ? '' : ' plain');
-  title.innerHTML = v ? '﴿' + esc(S.verses[v-1]) + '﴾ <span class="note">[' + SURAHS[S.surah].name + ': ' + AR(v) + ']</span>' : 'الكلام على السورة عامة';
-  main.appendChild(title);
-  (state.a ? [state.a] : ['IT','IQ']).forEach(a => main.appendChild(imamBlock(S, a, v)));
-}
-
-function shortRef(S, b, v, p){ return '«' + S.books[b].t + '» ' + (v ? AR(v) + '/' : '') + AR(p); }
-function refOf(r){ const pg = r.pe && r.pe !== r.p ? AR(r.p) + '–' + AR(r.pe) : AR(r.p); return (r.v ? 'ج' + AR(r.v) + ' ' : '') + 'ص ' + pg; }
-
-function allRecs(S){ const out = S.recs.slice(); const inc = extra[S.surah + 'inc']; if (inc) out.push(...inc); return out; }
-
-function imamBlock(S, a, v){
-  const B = S.books;
-  const el = document.createElement('section'); el.className = 'imam ' + a;
-  const pts = ((S.summ||{})[a] || {})[v] || [];
-  const rk = r => (B[r.b].w in RANK ? RANK[B[r.b].w] : 5);
-  const core = S.recs.filter(r => B[r.b].a === a && r.c && r.ay.includes(v)).sort((x,y) => rk(x)-rk(y) || x.id-y.id);
-  const scat = allRecs(S).filter(r => B[r.b].a === a && !r.c && r.ay.includes(v));
-  const visible = scat.filter(r => state.inc[a] || !r.inc);
-  el.innerHTML = '<div class="imam-head"><h2>' + FULL[a] + '</h2><small>المختصر بنص كلامه</small></div>';
-  if (pts.length){
-    const ul = document.createElement('ul'); ul.className = 'points';
-    pts.forEach(pt => ul.appendChild(pointEl(S, pt)));
-    el.appendChild(ul);
-  } else {
-    const n = core.length + visible.length;
-    el.insertAdjacentHTML('beforeend', '<p class="none">' + (n ? 'لم يُكتب مختصر هذه الآية بعدُ؛ نصوصه فيها في الاستفاضة.' : 'لم أجد له كلامًا على هذه الآية في كتبه المتاحة.') + '</p>');
-  }
-  const nq = ((S.nuq||{})[a] || {})[v] || [];
-  if (nq.length) el.appendChild(nuqEl(S, a, nq));
-  const btn = document.createElement('button');
-  btn.className = 'drawer-btn'; btn.type = 'button'; btn.setAttribute('aria-expanded', String(state.open[a]));
-  btn.innerHTML = 'للمذاكرة والدقائق: النصوص كاملة <span>' + AR(core.length + visible.length) + ' موضعًا ' + (state.open[a] ? '▴' : '▾') + '</span>';
-  btn.addEventListener('click', () => { state.open[a] = !state.open[a]; render(); });
-  el.appendChild(btn);
-  if (state.open[a]) el.appendChild(drawer(S, a, v, core, scat));
-  return el;
-}
-
-function pointEl(S, pt){
-  const li = document.createElement('li'); li.className = 'pt';
-  const label = () => shortRef(S, pt.b, pt.v, pt.p);
-  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p><button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
-  const btn = li.querySelector('.cite');
-  btn.addEventListener('click', () => {
-    let full = li.querySelector('.full');
-    if (full){ full.remove(); btn.setAttribute('aria-expanded','false'); btn.textContent = label() + ' · اقرأ الفقرة كاملة'; return; }
-    const r = S.byId.get(pt.r);
-    full = document.createElement('p'); full.className = 'full';
-    full.innerHTML = highlight(r ? r.t : (pt.ft || pt.t), [norm(pt.t)]);
-    li.querySelector('.pt-body').appendChild(full);
-    btn.setAttribute('aria-expanded','true'); btn.textContent = label() + ' · أخفِ الفقرة';
-  });
-  return li;
-}
-
-function stanceClass(s){ return /ردّه|ضعّفه/.test(s) ? 'no' : (/أقرّه|رجّحه/.test(s) ? 'ok' : ''); }
-function nuqEl(S, a, list){
-  const box = document.createElement('div'); box.className = 'nuq';
-  box.innerHTML = '<h3>ما نقله عن غيره' + (a === 'IT' ? '' : '') + '</h3>';
-  list.forEach(n => {
-    const it = document.createElement('div'); it.className = 'nq';
-    const ref = shortRef(S, n.b, n.v, n.p);
-    it.innerHTML = '<div class="nq-head"><span class="nq-who">' + esc(n.who) + '</span><span class="st ' + stanceClass(n.st) + '">' + esc(n.st) + '</span></div>' +
-      '<p class="nq-q">«' + highlight(n.t, []) + '»</p>' +
-      (n.rt ? '<p class="nq-r"><b>تعقيب ' + NAME[a] + ':</b> ' + highlight(n.rt, []) + '</p>' : '') +
-      '<button type="button" class="cite">' + esc(ref) + ' · اقرأ الفقرة كاملة</button>';
-    const b = it.querySelector('.cite');
-    b.addEventListener('click', () => {
-      let full = it.querySelector('.full');
-      if (full){ full.remove(); b.textContent = ref + ' · اقرأ الفقرة كاملة'; return; }
-      const r = S.byId.get(n.r); const r2 = n.rr && n.rr !== n.r ? S.byId.get(n.rr) : null;
-      full = document.createElement('p'); full.className = 'full';
-      full.innerHTML = highlight((r ? r.t : (n.ft || n.t)) + (r2 ? ' … ' + r2.t : ''), [norm(n.t)].concat(n.rt ? [norm(n.rt)] : []));
-      it.appendChild(full); b.textContent = ref + ' · أخفِ الفقرة';
-    });
-    box.appendChild(it);
-  });
-  return box;
-}
-
-function drawer(S, a, v, core, scat){
-  const d = document.createElement('div'); d.className = 'drawer';
-  const hl = verseTerms(S, v);
-  d.insertAdjacentHTML('beforeend', '<h3>أبواب أفردها للسورة أو للآية</h3><p class="hint">مرتبة كما وردت في الكتاب، فاقرأها متتابعة.</p>');
-  const cl = document.createElement('div'); cl.className = 'list';
-  if (!core.length) cl.innerHTML = '<div class="empty">لا يوجد له في هذه الآية باب مفرد.</div>';
-  core.slice(0, state.shown[a].c).forEach(r => cl.appendChild(card(S, r, hl)));
-  d.appendChild(cl);
-  if (core.length > state.shown[a].c) d.appendChild(moreBtn(core.length - state.shown[a].c, () => { state.shown[a].c += 30; render(); }));
-  d.insertAdjacentHTML('beforeend', '<h3>مواضع متفرقة في كتبه</h3>');
-  const tg = document.createElement('label'); tg.className = 'toggle';
-  const incKnown = S.surah === 1 || extra[S.surah + 'inc'];
-  const incN = scat.filter(r => r.inc).length;
-  tg.innerHTML = '<input type="checkbox" id="inc-' + a + '"' + (state.inc[a] ? ' checked' : '') + '> أظهر الاستشهادات العابرة أيضًا' + (incKnown ? ' (' + AR(incN) + ')' : '');
-  tg.querySelector('input').addEventListener('change', async e => {
-    state.inc[a] = e.target.checked;
-    if (state.inc[a] && SURAHS[S.surah].inc && !extra[S.surah + 'inc']){ e.target.disabled = true; await loadExtra(S.surah, 'inc'); }
-    render();
-  });
-  d.appendChild(tg);
-  const list = scat.filter(r => state.inc[a] || !r.inc);
-  const sl = document.createElement('div'); sl.className = 'list';
-  if (!list.length) sl.innerHTML = '<div class="empty">لا توجد مواضع أخرى.</div>';
-  list.slice(0, state.shown[a].s).forEach(r => sl.appendChild(card(S, r, hl)));
-  d.appendChild(sl);
-  if (list.length > state.shown[a].s) d.appendChild(moreBtn(list.length - state.shown[a].s, () => { state.shown[a].s += 30; render(); }));
-  return d;
-}
-function moreBtn(left, fn){ const b = document.createElement('button'); b.className = 'more'; b.type = 'button'; b.textContent = 'عرض المزيد (' + AR(left) + ' باقية)'; b.addEventListener('click', fn); return b; }
-
-function card(S, r, hl){
-  const bk = S.books[r.b];
-  const el = document.createElement('article'); el.className = 'card ' + bk.a;
-  const also = (r.also || []).map(([b,v,p]) => S.books[b].t + ' ' + (v ? 'ج' + AR(v) + ' ' : '') + 'ص ' + AR(p));
-  const tags = r.ay.slice(0, 8).map(v => '<span class="tag">' + (v ? 'الآية ' + AR(v) : 'السورة عامة') + '</span>');
-  el.innerHTML =
-    '<div class="meta"><span class="who">' + NAME[bk.a] + '</span><span class="book">' + esc(bk.t) + '</span><span class="ref">' + refOf(r) + '</span></div>' +
-    (r.h && !/^المجلد/.test(r.h) ? '<p class="hdr">' + esc(r.h.replace(/^\[|\]$/g,'')) + '</p>' : '') +
-    '<p class="text">' + highlight(r.t, hl) + '</p>' +
-    (state.q ? '<div class="tags">' + tags.join('') + '</div>' : '') +
-    (also.length ? '<div class="also">ورد أيضًا في: ' + esc(also.join('؛ ')) + '</div>' : '') +
-    (bk.w === 'IjtimacJuyush' ? '<div class="also">تنبيه: أكثر هذا الكتاب نقول عن الأئمة قبله، فتحقق من قائل النص.</div>' : '') +
-    '<div class="actions"></div>';
-  const text = el.querySelector('.text'), acts = el.querySelector('.actions');
-  if (r.t.length > 650){
-    text.classList.add('clamp');
-    acts.appendChild(btn('اقرأ الفقرة كاملة', b => { const c = text.classList.toggle('clamp'); b.textContent = c ? 'اقرأ الفقرة كاملة' : 'اختصر'; }));
-  }
-  if (r.cb || r.ca || r.x){
-    acts.appendChild(btn('أظهر السياق', async b => {
-      let ctx = el.querySelectorAll('.ctx');
-      if (!ctx.length){
-        let cb = r.cb, ca = r.ca;
-        if (r.x){ b.textContent = 'جارٍ التحميل…'; const C = await loadExtra(S.surah, 'ctx'); [cb, ca] = C[r.id] || ['','']; }
-        if (cb) text.insertAdjacentHTML('beforebegin', '<p class="ctx">' + esc(cb) + '</p>');
-        if (ca) text.insertAdjacentHTML('afterend', '<p class="ctx">' + esc(ca) + '</p>');
-        b.textContent = 'أخفِ السياق'; return;
-      }
-      const show = ctx[0].hidden; ctx.forEach(c => c.hidden = !show); b.textContent = show ? 'أخفِ السياق' : 'أظهر السياق';
-    }));
-  }
-  acts.appendChild(btn('نسخ مع الإحالة', () => copy(r.t + '\n\n— ' + NAME[bk.a] + '، «' + bk.t + '» ' + refOf(r) + (bk.ed ? ' (ط. ' + bk.ed + ')' : ''))));
-  if (bk.sh){ const a = document.createElement('a'); a.href = 'https://shamela.ws/book/' + bk.sh; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'الكتاب في الشاملة'; acts.appendChild(a); }
-  if (bk.ed){ const s = document.createElement('div'); s.className = 'also'; s.textContent = 'الطبعة: ' + bk.ed; el.appendChild(s); }
-  return el;
-}
-function btn(label, fn){ const b = document.createElement('button'); b.type='button'; b.textContent = label; b.addEventListener('click', () => fn(b)); return b; }
-
-function renderSearch(S){
-  const recs = allRecs(S);
-  if (!S._norm || S._norm.length !== recs.length) S._norm = recs.map(r => norm(r.t + ' ' + r.h));
-  const terms = norm(state.q).split(/\s+/).filter(Boolean);
-  const res = [];
-  recs.forEach((r, i) => { if (state.a && S.books[r.b].a !== state.a) return; if (terms.every(t => S._norm[i].includes(t))) res.push(r); });
-  res.sort((x,y) => (y.c?1:0)-(x.c?1:0) || (x.inc?1:0)-(y.inc?1:0) || x.id - y.id);
-  status.textContent = AR(res.length) + ' موضعًا في سورة ' + SURAHS[S.surah].name + ' فيها «' + state.q + '»' + (state.a ? ' · ' + NAME[state.a] : '');
-  const head = document.createElement('div'); head.className = 'row';
-  head.innerHTML = '<button type="button" class="more">← رجوع إلى الآية</button>';
-  head.querySelector('button').addEventListener('click', () => { state.q=''; qEl.value=''; render(); });
-  main.appendChild(head);
-  const list = document.createElement('div'); list.className = 'list';
-  if (!res.length) list.innerHTML = '<div class="empty">لا توجد نتائج. جرّب كلمة أقصر.</div>';
-  res.slice(0, state.qshown).forEach(r => list.appendChild(card(S, r, terms)));
-  main.appendChild(list);
-  if (res.length > state.qshown) main.appendChild(moreBtn(res.length - state.qshown, () => { state.qshown += 25; render(); }));
-}
-
-function toast(msg){ const t = document.getElementById('toast'); t.firstElementChild.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 1600); }
-function copy(s){
-  const fallback = () => { const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('نُسخ النص'); } catch(e){ toast('حدّد النص وانسخه يدويًا'); } ta.remove(); };
-  try { navigator.clipboard.writeText(s).then(() => toast('نُسخ النص مع الإحالة'), fallback); } catch(e){ fallback(); }
-}
-
-const m = /^#s(\d{1,3})a(\d{1,3})$/.exec(location.hash || '') || /^#a([0-7])$/.exec(location.hash || '');
-if (m && m.length === 3 && SURAHS[+m[1]]) go(+m[1], +m[2], false);
-else if (m) go(1, +m[1], false);
-else go(1, 0, false);
-// ===== public-site additions: whole-mushaf search, verse link, offline =====
-state.scope = 'all';
-(function scopeToggle(){
-  const box = document.querySelector('.search');
-  const sel = document.createElement('select');
-  sel.id = 'scope'; sel.setAttribute('aria-label', 'نطاق البحث');
-  sel.innerHTML = '<option value="all">في المصحف كله</option><option value="surah">في هذه السورة</option>';
-  sel.addEventListener('change', () => { state.scope = sel.value; if (state.q) render(); updatePh(); });
-  box.appendChild(sel);
-})();
-function updatePh(){
-  qEl.placeholder = state.scope === 'all'
-    ? 'ابحث في المختصرات والنقول في المصحف كله…'
-    : 'ابحث في نصوص سورة ' + SURAHS[state.s].name + '…';
-}
-const _go = go;
-go = async function(s, v, scroll){ await _go(s, v, scroll); updatePh(); };
-
-let SEARCH = null, SEARCHN = null;
-async function loadSearch(){
-  if (SEARCH) return SEARCH;
-  const r = await fetch('search.json'); SEARCH = await r.json();
-  SEARCHN = SEARCH.map(e => norm((e[3] ? e[4] + ' ' + e[5] : e[4])));
-  return SEARCH;
-}
-const _renderSearch = renderSearch;
-renderSearch = function(S){
-  if (state.scope !== 'all') return _renderSearch(S);
-  main.innerHTML = '<div class="loading">جارٍ البحث في المصحف كله…</div>';
-  loadSearch().then(() => {
-    const terms = norm(state.q).split(/\s+/).filter(Boolean);
-    const res = [];
-    SEARCH.forEach((e, i) => { if (state.a && e[2] !== state.a) return; if (terms.every(t => SEARCHN[i].includes(t))) res.push(e); });
-    main.innerHTML = '';
-    status.textContent = AR(res.length) + ' نتيجة في المصحف كله فيها «' + state.q + '»' + (state.a ? ' · ' + NAME[state.a] : '');
-    const head = document.createElement('div'); head.className = 'row';
-    head.innerHTML = '<button type="button" class="more">← رجوع إلى الآية</button>';
-    head.querySelector('button').addEventListener('click', () => { state.q=''; qEl.value=''; render(); });
-    main.appendChild(head);
-    const list = document.createElement('div'); list.className = 'list';
-    if (!res.length) list.innerHTML = '<div class="empty">لا توجد نتائج في المختصرات والنقول. جرّب «في هذه السورة» للبحث في النصوص الكاملة.</div>';
-    res.slice(0, state.qshown).forEach(e => {
-      const [s, v, a, isN] = e;
-      const el = document.createElement('button'); el.type = 'button'; el.className = 'gres';
-      el.innerHTML = '<span class="gres-h">سورة ' + esc(SURAHS[s].name) + ' · الآية ' + AR(v) + ' · ' + NAME[a] + ' · ' + (isN ? 'نقل عن ' + esc(e[4]) : 'مختصر') + '</span>'
-        + '<span class="gres-t">' + highlight(isN ? e[5] : e[4], terms) + '</span>';
-      el.addEventListener('click', () => { state.q=''; qEl.value=''; go(s, v, true); });
-      list.appendChild(el);
-    });
-    main.appendChild(list);
-    if (res.length > state.qshown) main.appendChild(moreBtn(res.length - state.qshown, () => { state.qshown += 25; render(); }));
-  }).catch(() => { main.innerHTML = '<div class="empty">تعذّر تحميل فهرس البحث.</div>'; });
-};
-
-// copy-link button for the current verse
-const _render = render;
-render = function(){
-  _render();
-  if (state.q || !cache[state.s]) return;
-  const b = document.createElement('button'); b.type = 'button'; b.className = 'linkbtn sharebtn';
-  b.textContent = 'انسخ رابط الآية';
-  b.addEventListener('click', () => {
-    const url = location.origin + location.pathname + '#s' + state.s + 'a' + state.ay;
-    const done = () => toast('نُسخ رابط الآية');
-    try { navigator.clipboard.writeText(url).then(done, () => prompt('انسخ الرابط:', url)); } catch(e){ prompt('انسخ الرابط:', url); }
-  });
-  main.prepend(b);
-};
-window.addEventListener('hashchange', () => {
-  const m2 = /^#s(\d{1,3})a(\d{1,3})$/.exec(location.hash || '');
-  if (m2 && SURAHS[+m2[1]] && (+m2[1] !== state.s || +m2[2] !== state.ay)) go(+m2[1], +m2[2], true);
-});
-
-// offline: service worker + "save everything"
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-const dl = document.getElementById('dlall');
-if (dl) dl.addEventListener('click', async () => {
-  if (!confirm('سيُحفظ نص المختصرات والنصوص الرئيسية لكل السور (نحو ٧٠ ميجا) لتعمل دون إنترنت. متابعة؟')) return;
-  dl.disabled = true;
-  const files = ['search.json'];
-  for (let n = 1; n <= 114; n++) files.push('s' + n + '.json');
-  let done = 0;
-  for (const f of files){
-    try { await fetch(f, {cache: 'reload'}); } catch(e){}
-    done++; dl.textContent = 'جارٍ الحفظ… ' + AR(Math.round(done * 100 / files.length)) + '٪';
-  }
-  dl.textContent = 'حُفظ المصحف كله للقراءة دون إنترنت';
-});
-updatePh();
-
-// ===== translations: verse meaning (QuranEnc) + approximate translation of summaries =====
-const TRV = {}, TRS = {};
-function fnv(s){ s = s.replace(/\s+/g, ' ').trim(); let h = 0x811c9dc5; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); }
-function curLang(){ return (window.I18N && I18N.lang) || 'ar'; }
-async function ensureTr(l, s){
-  const kv = l + s;
-  if (!TRV[kv]) TRV[kv] = await fetch('tr/' + l + '/' + s + '.json').then(r => r.json()).catch(() => []);
-  if (!TRS[l]) TRS[l] = await fetch('st/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
-}
-function trBlock(text, cls, l){
-  const p = document.createElement('p'); p.className = cls; p.setAttribute('dir', (I18N.meta && I18N.meta[l] && I18N.meta[l].dir) || 'auto'); p.setAttribute('lang', l);
-  p.textContent = text; return p;
-}
-const _render2 = render;
-render = function(){
-  _render2();
-  const l = curLang(); if (l === 'ar' || state.q) return;
-  const s = state.s, v = state.ay;
-  if (!TRV[l + s] || !TRS[l]){ ensureTr(l, s).then(() => { if (state.s === s && curLang() === l) render(); }); return; }
-  const m = (I18N.meta || {})[l] || {};
-  const vt = document.querySelector('.verse-title');
-  if (vt && v && TRV[l + s][v - 1]){
-    const [t, fn] = TRV[l + s][v - 1];
-    const box = document.createElement('div'); box.className = 'tr-verse';
-    box.innerHTML = '<span class="tr-label">ترجمة معاني الآية</span>';
-    box.appendChild(trBlock(t, 'tr-text', l));
-    if (fn){ const d = document.createElement('details'); d.innerHTML = '<summary>…</summary>'; d.appendChild(trBlock(fn, 'tr-fn', l)); box.appendChild(d); }
-    const cr = document.createElement('a'); cr.className = 'tr-credit'; cr.href = m.url || 'https://quranenc.com'; cr.target = '_blank'; cr.rel = 'noopener';
-    cr.textContent = (m.title || '') + ' — v' + (m.version || '') + ' · QuranEnc.com'; cr.setAttribute('dir', 'ltr');
-    box.appendChild(cr);
-    vt.after(box);
-  }
-  const map = TRS[l] || {};
-  let any = false;
-  document.querySelectorAll('.pt .quote, .nq-q').forEach(q => {
-    const t = q.textContent.replace(/^«|»$/g, '');
-    const tr = map[fnv(t)]; if (!tr) return;
-    any = true; q.after(trBlock(tr, 'tr-sum', l));
-  });
-  if (any && !document.querySelector('.tr-note')){
-    const n = document.createElement('p'); n.className = 'tr-note tr-label'; n.textContent = 'ترجمة تقريبية للمختصر — النص العربي هو المرجع';
-    const first = document.querySelector('.imam'); if (first) first.before(n);
-  }
-};
-if (window.I18N) I18N.onChange.push(() => render());
-
-})();
-</script>
+  <h2 class="sec-h" id="suras">فهرس السور</h2>
+  <nav class="suras" aria-label="فهرس السور"><a class="sura" href="/surah/1.html"><span><span class="n">١</span> <b>الفاتحة</b></span><span class="c">٨ آية</span></a><a class="sura" href="/surah/2.html"><span><span class="n">٢</span> <b>البقرة</b></span><span class="c">١٢٩ آية</span></a><a class="sura" href="/surah/3.html"><span><span class="n">٣</span> <b>آل عمران</b></span><span class="c">٥٩ آية</span></a><a class="sura" href="/surah/4.html"><span><span class="n">٤</span> <b>النساء</b></span><span class="c">٦٤ آية</span></a><a class="sura" href="/surah/5.html"><span><span class="n">٥</span> <b>المائدة</b></span><span class="c">٤١ آية</span></a><a class="sura" href="/surah/6.html"><span><span class="n">٦</span> <b>الأنعام</b></span><span class="c">٦٦ آية</span></a><a class="sura" href="/surah/7.html"><span><span class="n">٧</span> <b>الأعراف</b></span><span class="c">٥٤ آية</span></a><a class="sura" href="/surah/8.html"><span><span class="n">٨</span> <b>الأنفال</b></span><span class="c">٢٤ آية</span></a><a class="sura" href="/surah/9.html"><span><span class="n">٩</span> <b>التوبة</b></span><span class="c">٥٥ آية</span></a><a class="sura" href="/surah/10.html"><span><span class="n">١٠</span> <b>يونس</b></span><span class="c">٣٠ آية</span></a><a class="sura" href="/surah/11.html"><span><span class="n">١١</span> <b>هود</b></span><span class="c">٢٥ آية</span></a><a class="sura" href="/surah/12.html"><span><span class="n">١٢</span> <b>يوسف</b></span><span class="c">٢٤ آية</span></a><a class="sura" href="/surah/13.html"><span><span class="n">١٣</span> <b>الرعد</b></span><span class="c">٩ آية</span></a><a class="sura" href="/surah/14.html"><span><span class="n">١٤</span> <b>إبراهيم</b></span><span class="c">١٠ آية</span></a><a class="sura" href="/surah/15.html"><span><span class="n">١٥</span> <b>الحجر</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/16.html"><span><span class="n">١٦</span> <b>النحل</b></span><span class="c">٣٣ آية</span></a><a class="sura" href="/surah/17.html"><span><span class="n">١٧</span> <b>الإسراء</b></span><span class="c">٤٣ آية</span></a><a class="sura" href="/surah/18.html"><span><span class="n">١٨</span> <b>الكهف</b></span><span class="c">٢٢ آية</span></a><a class="sura" href="/surah/19.html"><span><span class="n">١٩</span> <b>مريم</b></span><span class="c">٢٥ آية</span></a><a class="sura" href="/surah/20.html"><span><span class="n">٢٠</span> <b>طه</b></span><span class="c">٢٢ آية</span></a><a class="sura" href="/surah/21.html"><span><span class="n">٢١</span> <b>الأنبياء</b></span><span class="c">٢٩ آية</span></a><a class="sura" href="/surah/22.html"><span><span class="n">٢٢</span> <b>الحج</b></span><span class="c">٢٢ آية</span></a><a class="sura" href="/surah/23.html"><span><span class="n">٢٣</span> <b>المؤمنون</b></span><span class="c">١٥ آية</span></a><a class="sura" href="/surah/24.html"><span><span class="n">٢٤</span> <b>النور</b></span><span class="c">٢١ آية</span></a><a class="sura" href="/surah/25.html"><span><span class="n">٢٥</span> <b>الفرقان</b></span><span class="c">١٤ آية</span></a><a class="sura" href="/surah/26.html"><span><span class="n">٢٦</span> <b>الشعراء</b></span><span class="c">١٤ آية</span></a><a class="sura" href="/surah/27.html"><span><span class="n">٢٧</span> <b>النمل</b></span><span class="c">١١ آية</span></a><a class="sura" href="/surah/28.html"><span><span class="n">٢٨</span> <b>القصص</b></span><span class="c">١٨ آية</span></a><a class="sura" href="/surah/29.html"><span><span class="n">٢٩</span> <b>العنكبوت</b></span><span class="c">١٥ آية</span></a><a class="sura" href="/surah/30.html"><span><span class="n">٣٠</span> <b>الروم</b></span><span class="c">١٠ آية</span></a><a class="sura" href="/surah/31.html"><span><span class="n">٣١</span> <b>لقمان</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/32.html"><span><span class="n">٣٢</span> <b>السجدة</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/33.html"><span><span class="n">٣٣</span> <b>الأحزاب</b></span><span class="c">٢٥ آية</span></a><a class="sura" href="/surah/34.html"><span><span class="n">٣٤</span> <b>سبأ</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/35.html"><span><span class="n">٣٥</span> <b>فاطر</b></span><span class="c">٦ آية</span></a><a class="sura" href="/surah/36.html"><span><span class="n">٣٦</span> <b>يس</b></span><span class="c">١٧ آية</span></a><a class="sura" href="/surah/37.html"><span><span class="n">٣٧</span> <b>الصافات</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/38.html"><span><span class="n">٣٨</span> <b>ص</b></span><span class="c">٩ آية</span></a><a class="sura" href="/surah/39.html"><span><span class="n">٣٩</span> <b>الزمر</b></span><span class="c">١٨ آية</span></a><a class="sura" href="/surah/40.html"><span><span class="n">٤٠</span> <b>غافر</b></span><span class="c">١٢ آية</span></a><a class="sura" href="/surah/41.html"><span><span class="n">٤١</span> <b>فصلت</b></span><span class="c">٢٠ آية</span></a><a class="sura" href="/surah/42.html"><span><span class="n">٤٢</span> <b>الشورى</b></span><span class="c">١٣ آية</span></a><a class="sura" href="/surah/43.html"><span><span class="n">٤٣</span> <b>الزخرف</b></span><span class="c">٢٦ آية</span></a><a class="sura" href="/surah/44.html"><span><span class="n">٤٤</span> <b>الدخان</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/45.html"><span><span class="n">٤٥</span> <b>الجاثية</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/46.html"><span><span class="n">٤٦</span> <b>الأحقاف</b></span><span class="c">٨ آية</span></a><a class="sura" href="/surah/47.html"><span><span class="n">٤٧</span> <b>محمد</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/48.html"><span><span class="n">٤٨</span> <b>الفتح</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/49.html"><span><span class="n">٤٩</span> <b>الحجرات</b></span><span class="c">٩ آية</span></a><a class="sura" href="/surah/50.html"><span><span class="n">٥٠</span> <b>ق</b></span><span class="c">١٤ آية</span></a><a class="sura" href="/surah/51.html"><span><span class="n">٥١</span> <b>الذاريات</b></span><span class="c">١٩ آية</span></a><a class="sura" href="/surah/52.html"><span><span class="n">٥٢</span> <b>الطور</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/53.html"><span><span class="n">٥٣</span> <b>النجم</b></span><span class="c">١٧ آية</span></a><a class="sura" href="/surah/54.html"><span><span class="n">٥٤</span> <b>القمر</b></span><span class="c">٨ آية</span></a><a class="sura" href="/surah/55.html"><span><span class="n">٥٥</span> <b>الرحمن</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/56.html"><span><span class="n">٥٦</span> <b>الواقعة</b></span><span class="c">١٧ آية</span></a><a class="sura" href="/surah/57.html"><span><span class="n">٥٧</span> <b>الحديد</b></span><span class="c">١١ آية</span></a><a class="sura" href="/surah/58.html"><span><span class="n">٥٨</span> <b>المجادلة</b></span><span class="c">٨ آية</span></a><a class="sura" href="/surah/59.html"><span><span class="n">٥٩</span> <b>الحشر</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/60.html"><span><span class="n">٦٠</span> <b>الممتحنة</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/61.html"><span><span class="n">٦١</span> <b>الصف</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/62.html"><span><span class="n">٦٢</span> <b>الجمعة</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/63.html"><span><span class="n">٦٣</span> <b>المنافقون</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/64.html"><span><span class="n">٦٤</span> <b>التغابن</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/65.html"><span><span class="n">٦٥</span> <b>الطلاق</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/66.html"><span><span class="n">٦٦</span> <b>التحريم</b></span><span class="c">٦ آية</span></a><a class="sura" href="/surah/67.html"><span><span class="n">٦٧</span> <b>الملك</b></span><span class="c">٩ آية</span></a><a class="sura" href="/surah/68.html"><span><span class="n">٦٨</span> <b>القلم</b></span><span class="c">٨ آية</span></a><a class="sura" href="/surah/69.html"><span><span class="n">٦٩</span> <b>الحاقة</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/70.html"><span><span class="n">٧٠</span> <b>المعارج</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/71.html"><span><span class="n">٧١</span> <b>نوح</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/72.html"><span><span class="n">٧٢</span> <b>الجن</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/73.html"><span><span class="n">٧٣</span> <b>المزمل</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/74.html"><span><span class="n">٧٤</span> <b>المدثر</b></span><span class="c">٦ آية</span></a><a class="sura" href="/surah/75.html"><span><span class="n">٧٥</span> <b>القيامة</b></span><span class="c">١٢ آية</span></a><a class="sura" href="/surah/76.html"><span><span class="n">٧٦</span> <b>الإنسان</b></span><span class="c">٩ آية</span></a><a class="sura" href="/surah/77.html"><span><span class="n">٧٧</span> <b>المرسلات</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/78.html"><span><span class="n">٧٨</span> <b>النبأ</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/79.html"><span><span class="n">٧٩</span> <b>النازعات</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/80.html"><span><span class="n">٨٠</span> <b>عبس</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/81.html"><span><span class="n">٨١</span> <b>التكوير</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/82.html"><span><span class="n">٨٢</span> <b>الانفطار</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/83.html"><span><span class="n">٨٣</span> <b>المطففين</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/84.html"><span><span class="n">٨٤</span> <b>الانشقاق</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/85.html"><span><span class="n">٨٥</span> <b>البروج</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/86.html"><span><span class="n">٨٦</span> <b>الطارق</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/87.html"><span><span class="n">٨٧</span> <b>الأعلى</b></span><span class="c">٥ آية</span></a><a class="sura" href="/surah/88.html"><span><span class="n">٨٨</span> <b>الغاشية</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/89.html"><span><span class="n">٨٩</span> <b>الفجر</b></span><span class="c">٦ آية</span></a><a class="sura" href="/surah/90.html"><span><span class="n">٩٠</span> <b>البلد</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/91.html"><span><span class="n">٩١</span> <b>الشمس</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/92.html"><span><span class="n">٩٢</span> <b>الليل</b></span><span class="c">٧ آية</span></a><a class="sura" href="/surah/93.html"><span><span class="n">٩٣</span> <b>الضحى</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/94.html"><span><span class="n">٩٤</span> <b>الشرح</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/95.html"><span><span class="n">٩٥</span> <b>التين</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/96.html"><span><span class="n">٩٦</span> <b>العلق</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/97.html"><span><span class="n">٩٧</span> <b>القدر</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/98.html"><span><span class="n">٩٨</span> <b>البينة</b></span><span class="c">٣ آية</span></a><a class="sura" href="/surah/99.html"><span><span class="n">٩٩</span> <b>الزلزلة</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/100.html"><span><span class="n">١٠٠</span> <b>العاديات</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/101.html"><span><span class="n">١٠١</span> <b>القارعة</b></span><span class="c">٠ آية</span></a><a class="sura" href="/surah/102.html"><span><span class="n">١٠٢</span> <b>التكاثر</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/103.html"><span><span class="n">١٠٣</span> <b>العصر</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/104.html"><span><span class="n">١٠٤</span> <b>الهمزة</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/105.html"><span><span class="n">١٠٥</span> <b>الفيل</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/106.html"><span><span class="n">١٠٦</span> <b>قريش</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/107.html"><span><span class="n">١٠٧</span> <b>الماعون</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/108.html"><span><span class="n">١٠٨</span> <b>الكوثر</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/109.html"><span><span class="n">١٠٩</span> <b>الكافرون</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/110.html"><span><span class="n">١١٠</span> <b>النصر</b></span><span class="c">١ آية</span></a><a class="sura" href="/surah/111.html"><span><span class="n">١١١</span> <b>المسد</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/112.html"><span><span class="n">١١٢</span> <b>الإخلاص</b></span><span class="c">٤ آية</span></a><a class="sura" href="/surah/113.html"><span><span class="n">١١٣</span> <b>الفلق</b></span><span class="c">٢ آية</span></a><a class="sura" href="/surah/114.html"><span><span class="n">١١٤</span> <b>الناس</b></span><span class="c">٢ آية</span></a></nav>
+</main>
+<link rel="stylesheet" href="/theme.css">
 <footer class="site-foot">
-  <span>جامع تفسير الشيخين · <a href="index.html">الرئيسية</a> · <a href="about.html">عن المشروع</a> · <a href="about.html#feedback">أرسل تصويبًا</a></span>
+  <span>جامع تفسير الشيخين · <a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/about.html">عن المشروع</a> · <a href="/about.html#feedback">أرسل تصويبًا</a></span>
   <a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a>
 </footer>
 

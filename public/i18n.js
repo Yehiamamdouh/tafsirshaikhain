@@ -29,8 +29,8 @@
   async function setLang(l){
     I.lang = l; try { localStorage.setItem('lang', l); } catch(e){}
     if (l === 'ar'){ if (I.dict){ location.reload(); return; } return; }
-    const meta = I.meta || (I.meta = await fetch('tr/langs.json').then(r => r.json()).catch(() => ({})));
-    I.dict = await fetch('i18n/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+    const meta = I.meta || (I.meta = await fetch('/tr/langs.json').then(r => r.json()).catch(() => ({})));
+    I.dict = await fetch('/i18n/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
     subs = keysBySize();
     const ab = document.querySelector('main.ab'); if (ab && meta[l]) ab.setAttribute('dir', meta[l].dir);
     document.documentElement.setAttribute('lang', l);
@@ -43,7 +43,7 @@
     if (!host) return;
     const sel = document.createElement('select'); sel.id = 'langsel'; sel.setAttribute('aria-label', 'اللغة / Language');
     sel.innerHTML = '<option value="ar">العربية</option>';
-    fetch('tr/langs.json').then(r => r.json()).then(m => {
+    fetch('/tr/langs.json').then(r => r.json()).then(m => {
       I.meta = m;
       Object.entries(m).forEach(([k, v]) => { const o = document.createElement('option'); o.value = k; o.textContent = v.name; sel.appendChild(o); });
       sel.value = I.lang;
