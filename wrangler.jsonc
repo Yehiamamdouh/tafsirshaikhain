@@ -1,0 +1,10 @@
+{
+  // Cloudflare Worker with static assets: the whole site lives in ./public
+  "name": "tafsirshaikhain",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  // Feedback e-mail: destination is NOT stored here; it is the FEEDBACK_TO secret
+  "send_email": [{ "name": "MAIL" }],
+  "vars": { "FEEDBACK_FROM": "feedback@tafsirshaikhain.com" }
+}
