@@ -22,7 +22,7 @@ async function langPage(req, env, url, m) {
   else if (ss) { file = ss + "_0"; key = "surah/" + ss + ".html"; }
   const r = await env.ASSETS.fetch(new Request(url.origin + "/lp/" + l + "/" + file + ".json"));
   const html = r.ok ? (await r.json())[key] : null;
-  if (!html) return env.ASSETS.fetch(new Request(url.origin + "/404.html"));
+  if (!html) { const nf = await env.ASSETS.fetch(new Request(url.origin + "/404.html")); return new Response(nf.body, { status: 404, headers: nf.headers }); }
   const res = new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
   if (req.method === "GET") await cache.put(req, res.clone());
   return res;

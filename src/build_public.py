@@ -161,6 +161,9 @@ bl=''.join(f'<section><h2>{IMAM[a]}</h2><div class="vrows">'+''.join(f'<a class=
 write('books.html',page('مصادر جامع تفسير الشيخين — كتب ابن تيمية وابن القيم','كتب شيخ الإسلام ابن تيمية والإمام ابن القيم التي جُمع منها تفسيرهما، مع الآيات المنقولة من كل كتاب.','/books.html',
       style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › المصادر</nav><h1>المصادر</h1>'+bl+'</main>'))
 urls.append('/books.html')
+nf=page('الصفحة غير موجودة — جامع تفسير الشيخين','الصفحة المطلوبة غير موجودة.','/404.html',
+        style+'<main class="sp"><h1>الصفحة غير موجودة</h1><p lang="en" dir="ltr">Page not found.</p><a class="btn pri open" href="/">الرئيسية · Home</a></main>')
+write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<meta name="robots" content="noindex">'))
 shutil.copy2(T+'/og.png',P)
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in urls)+'</urlset>\n'
 open(P+'/sitemap.xml','w').write(sm)
