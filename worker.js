@@ -14,6 +14,7 @@ const recent = new Map(); // soft per-isolate rate limit
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname === "/api/envcheck") return json({ keys: Object.keys(env).sort() }); // names only, no values (temporary)
     if (url.pathname !== "/api/feedback") return env.ASSETS.fetch(req);
     if (req.method !== "POST") return json({ error: "method" }, 405);
 
