@@ -9,12 +9,42 @@ import { EmailMessage } from "cloudflare:email";
 const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { "content-type": "application/json; charset=utf-8" } });
 const b64 = s => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
 const hdr = s => "=?UTF-8?B?" + b64(s) + "?=";
-const recent = new Map(); // soft per-isolate rate limit
+const recent = new Map();
+// Verse/surah pages for languages that have no static files: pre-rendered HTML lives in /lp/{lang}/{surah}_{chunk}.json
+const DYN = /^\/(bn|ms|fa|ru|sw|ha|es|de|zh)(?:\/(?:(ayah\/(\d{1,3})-(\d{1,3})|surah\/(\d{1,3}))\.html)?)?$/;
+async function langPage(req, env, url, m) {
+  const [, l, , as, av, ss] = m;
+  if (url.pathname === "/" + l) return Response.redirect(url.origin + "/" + l + "/", 301);
+  const cache = caches.default, hit = await cache.match(req);
+  if (hit) return hit;
+  let file = "home", key = "";
+  if (as) { file = as + "_" + Math.floor(+av / 50); key = "ayah/" + as + "-" + av + ".html"; }
+  else if (ss) { file = ss + "_0"; key = "surah/" + ss + ".html"; }
+  const r = await env.ASSETS.fetch(new Request(url.origin + "/lp/" + l + "/" + file + ".json"));
+  const html = r.ok ? (await r.json())[key] : null;
+  if (!html) return env.ASSETS.fetch(new Request(url.origin + "/404.html"));
+  const res = new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+  if (req.method === "GET") await cache.put(req, res.clone());
+  return res;
+} // soft per-isolate rate limit
 
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (url.pathname !== "/api/feedback") return env.ASSETS.fetch(req);
+    const m = url.pathname.match(DYN);
+    if (m) return langPage(req, env, url, m);
+    // html_handling is "none" so /x.html is served as-is (no redirect); directories map to index.html here
+    if (url.pathname.endsWith("/")) return env.ASSETS.fetch(new Request(url.origin + url.pathname + "index.html", req));
+    if (url.pathname !== "/api/feedback") {
+      const r = await env.ASSETS.fetch(req);
+      if (r.status !== 404 || /\.[a-z0-9]+$/i.test(url.pathname)) return r;
+      // old pretty URLs (/ayah/2-255, /en) → canonical .html or directory
+      for (const alt of [url.pathname + ".html", url.pathname + "/index.html"]) {
+        const a = await env.ASSETS.fetch(new Request(url.origin + alt, { method: "HEAD" }));
+        if (a.ok) return Response.redirect(url.origin + alt.replace(/index\.html$/, "") + url.search, 301);
+      }
+      return r;
+    }
     if (req.method !== "POST") return json({ error: "method" }, 405);
 
     const ip = req.headers.get("cf-connecting-ip") || "0";
