@@ -10,8 +10,8 @@ const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, header
 const b64 = s => btoa(String.fromCharCode(...new TextEncoder().encode(s)));
 const hdr = s => "=?UTF-8?B?" + b64(s) + "?=";
 const recent = new Map();
-// Verse/surah pages for languages that have no static files: pre-rendered HTML lives in /lp/{lang}/{surah}_{chunk}.json
-const DYN = /^\/(bn|ms|fa|ru|sw|ha|es|de|zh)(?:\/(?:(ayah\/(\d{1,3})-(\d{1,3})|surah\/(\d{1,3}))\.html)?)?$/;
+// Verse/surah pages for all non-Arabic languages: pre-rendered HTML lives in /lp/{lang}/{surah}_{chunk}.json
+const DYN = /^\/(en|ur|id|tr|fr|bn|ms|fa|ru|sw|ha|es|de|zh)(?:\/(?:(ayah\/(\d{1,3})-(\d{1,3})|surah\/(\d{1,3}))\.html)?)?$/;
 async function langPage(req, env, url, m) {
   const [, l, , as, av, ss] = m;
   if (url.pathname === "/" + l) return Response.redirect(url.origin + "/" + l + "/", 301);

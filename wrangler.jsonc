@@ -8,7 +8,7 @@
     { "pattern": "tafsirshaikhain.com", "custom_domain": true },
     { "pattern": "www.tafsirshaikhain.com", "custom_domain": true }
   ],
-  "assets": { "directory": "./public", "binding": "ASSETS", "html_handling": "none", "run_worker_first": ["/api/*", "/bn", "/bn/*", "/ms", "/ms/*", "/fa", "/fa/*", "/ru", "/ru/*", "/sw", "/sw/*", "/ha", "/ha/*", "/es", "/es/*", "/de", "/de/*", "/zh", "/zh/*"] },
+  "assets": { "directory": "./public", "binding": "ASSETS", "html_handling": "none", "run_worker_first": ["/api/*", "/en", "/en/", "/en/ayah/*", "/en/surah/*", "/ur", "/ur/", "/ur/ayah/*", "/ur/surah/*", "/id", "/id/", "/id/ayah/*", "/id/surah/*", "/tr", "/tr/", "/tr/ayah/*", "/tr/surah/*", "/fr", "/fr/", "/fr/ayah/*", "/fr/surah/*", "/bn", "/bn/", "/bn/ayah/*", "/bn/surah/*", "/ms", "/ms/", "/ms/ayah/*", "/ms/surah/*", "/fa", "/fa/", "/fa/ayah/*", "/fa/surah/*", "/ru", "/ru/", "/ru/ayah/*", "/ru/surah/*", "/sw", "/sw/", "/sw/ayah/*", "/sw/surah/*", "/ha", "/ha/", "/ha/ayah/*", "/ha/surah/*", "/es", "/es/", "/es/ayah/*", "/es/surah/*", "/de", "/de/", "/de/ayah/*", "/de/surah/*", "/zh", "/zh/", "/zh/ayah/*", "/zh/surah/*"] },
   // Feedback e-mail: destination is NOT stored here; it is the FEEDBACK_TO secret
   "send_email": [{ "name": "MAIL" }],
   // keep variables set in the dashboard (e.g. FEEDBACK_TO) across Git deploys
