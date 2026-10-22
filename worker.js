@@ -43,7 +43,8 @@ export default {
         const a = await env.ASSETS.fetch(new Request(url.origin + alt, { method: "HEAD" }));
         if (a.ok) return Response.redirect(url.origin + alt.replace(/index\.html$/, "") + url.search, 301);
       }
-      return r;
+      const nf = await env.ASSETS.fetch(new Request(url.origin + "/404.html"));
+      return new Response(nf.body, { status: 404, headers: nf.headers });
     }
     if (req.method !== "POST") return json({ error: "method" }, 405);
 
