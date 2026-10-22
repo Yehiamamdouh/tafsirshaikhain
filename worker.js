@@ -21,6 +21,8 @@ export default {
     const now = Date.now(), hits = (recent.get(ip) || []).filter(t => now - t < 3600e3);
     if (hits.length >= 5) return json({ error: "أرسلت ملاحظات كثيرة، حاول بعد ساعة." }, 429);
 
+    const FROM = env.FEEDBACK_FROM || "feedback@tafsirshaikhain.com";
+    if (!env.FEEDBACK_TO) return json({ error: "النموذج غير مهيأ بعد (FEEDBACK_TO)." }, 500);
     let f;
     try { f = await req.formData(); } catch { return json({ error: "bad form" }, 400); }
     const get = k => String(f.get(k) || "").trim();
@@ -42,11 +44,11 @@ export default {
       "البريد: " + (email || "-"), "", body,
     ].join("\n");
     const raw = [
-      "From: " + hdr("جامع تفسير الشيخين") + " <" + env.FEEDBACK_FROM + ">",
+      "From: " + hdr("جامع تفسير الشيخين") + " <" + FROM + ">",
       "To: <" + env.FEEDBACK_TO + ">",
       ...(email && /^[^@\s<>]+@[^@\s<>]+$/.test(email) ? ["Reply-To: <" + email + ">"] : []),
       "Subject: " + hdr("تصويب: " + ref),
-      "Message-ID: <" + crypto.randomUUID() + "@" + env.FEEDBACK_FROM.split("@")[1] + ">",
+      "Message-ID: <" + crypto.randomUUID() + "@" + FROM.split("@")[1] + ">",
       "Date: " + new Date().toUTCString(),
       "MIME-Version: 1.0",
       "Content-Type: text/plain; charset=UTF-8",
@@ -54,7 +56,7 @@ export default {
       "", b64(text),
     ].join("\r\n");
     try {
-      await env.MAIL.send(new EmailMessage(env.FEEDBACK_FROM, env.FEEDBACK_TO, raw));
+      await env.MAIL.send(new EmailMessage(FROM, env.FEEDBACK_TO, raw));
     } catch (e) { return json({ error: "تعذّر الإرسال الآن. (" + String(e && e.message || e).slice(0, 200) + (env.FEEDBACK_TO ? "" : " | no FEEDBACK_TO") + ")" }, 500); }
     hits.push(now); recent.set(ip, hits);
     return json({ ok: true });
