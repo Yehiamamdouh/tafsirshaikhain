@@ -34,7 +34,7 @@ export default {
       method: "POST",
       body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: get("cf-turnstile-response"), remoteip: ip }),
     }).then(r => r.json()).catch(() => ({}));
-    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." }, 400);
+    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." + (env.TURNSTILE_SECRET ? "" : " [no secret]") + " (" + (ts["error-codes"] || []).join(",") + ")" }, 400);
 
     const email = get("email").slice(0, 120);
     const text = [
