@@ -36,7 +36,7 @@ export default {
       method: "POST",
       body: new URLSearchParams({ secret: env.TURNSTILE_SECRET || env.SecretKey, response: get("cf-turnstile-response"), remoteip: ip }),
     }).then(r => r.json()).catch(() => ({}));
-    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." + ((env.TURNSTILE_SECRET || env.SecretKey) ? "" : " [no secret]") + " (" + (ts["error-codes"] || []).join(",") + ")" }, 400);
+    if (!ts.success) return json({ error: "فشل التحقق، أعد المحاولة." }, 400);
 
     const email = get("email").slice(0, 120);
     const text = [
@@ -57,7 +57,7 @@ export default {
     ].join("\r\n");
     try {
       await env.MAIL.send(new EmailMessage(FROM, env.FEEDBACK_TO, raw));
-    } catch (e) { return json({ error: "تعذّر الإرسال الآن. (" + String(e && e.message || e).slice(0, 200) + (env.FEEDBACK_TO ? "" : " | no FEEDBACK_TO") + ")" }, 500); }
+    } catch (e) { return json({ error: "تعذّر الإرسال الآن." }, 500); }
     hits.push(now); recent.set(ip, hits);
     return json({ ok: true });
   },
