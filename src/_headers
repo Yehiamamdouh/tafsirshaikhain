@@ -1,0 +1,4 @@
+/*.json
+  Cache-Control: public, max-age=3600
+/sw.js
+  Cache-Control: no-cache

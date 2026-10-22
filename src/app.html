@@ -1,0 +1,544 @@
+<title>الفاتحة عند الشيخين</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: a reading desk — the surah is the index; for each verse, each imam has his own short sheet, with a drawer of full texts beneath it. */
+:root{
+  --paper:#f3f5f7; --sheet:#ffffff; --ink:#18212e; --muted:#5b6676; --line:#d9dee6;
+  --lapis:#1f4f8f; --lapis-soft:#e3ebf6; --saffron:#a8670c; --saffron-soft:#f6ecdc;
+  --mark:#fde7a6; --mark-ink:#18212e;
+  --f-quran:"Amiri Quran","Amiri","Noto Naskh Arabic",serif;
+  --f-display:"Reem Kufi","Noto Naskh Arabic",sans-serif;
+  --f-read:"Noto Naskh Arabic","Amiri","Times New Roman",serif;
+  --f-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f1520; --sheet:#161e2b; --ink:#e6eaf0; --muted:#98a3b4; --line:#273244;
+  --lapis:#8fb4ea; --lapis-soft:#1c2b44; --saffron:#e3a649; --saffron-soft:#2e2414;
+  --mark:#5a4612; --mark-ink:#fff4d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f1520; --sheet:#161e2b; --ink:#e6eaf0; --muted:#98a3b4; --line:#273244;
+  --lapis:#8fb4ea; --lapis-soft:#1c2b44; --saffron:#e3a649; --saffron-soft:#2e2414;
+  --mark:#5a4612; --mark-ink:#fff4d6; color-scheme:dark}
+html{direction:rtl}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:860px;margin:0 auto;display:grid;gap:20px}
+header.top{display:grid;gap:6px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,6vw,36px);line-height:1.25;margin:0;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:62ch}
+
+/* The surah as index */
+.surah{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.surah-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.surah-head b{font-family:var(--f-display);font-size:18px;font-weight:500}
+.surah-head span{font-size:12.5px;color:var(--muted)}
+.ayah{display:grid;grid-template-columns:2.2em 1fr;align-items:center;gap:10px;width:100%;text-align:start;
+  background:none;border:0;border-bottom:1px solid var(--line);padding:9px 16px;cursor:pointer;color:inherit;font:inherit}
+.ayah:last-child{border-bottom:0}
+.ayah:hover{background:var(--lapis-soft)}
+.ayah[aria-pressed="true"]{background:var(--lapis-soft);box-shadow:inset -4px 0 0 var(--lapis)}
+.ayah .no{font-family:var(--f-quran);font-size:18px;color:var(--muted);text-align:center}
+.ayah .txt{font-family:var(--f-quran);font-size:clamp(19px,4.6vw,24px);line-height:2;min-width:0}
+.ayah .txt.plain{font-family:var(--f-ui);font-size:15px;line-height:1.5;font-weight:500}
+
+/* Controls */
+.controls{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;display:grid;gap:10px;border-bottom:1px solid var(--line)}
+.search{display:flex;gap:8px}
+.search input{flex:1;min-width:0;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink)}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--lapis);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--sheet)}
+.seg button{font:inherit;font-size:13.5px;border:0;background:none;color:var(--ink);padding:6px 11px;cursor:pointer}
+.seg button+button{border-inline-start:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.status{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Verse view */
+.verse-title{font-family:var(--f-quran);font-size:clamp(22px,5.5vw,30px);line-height:1.9;margin:0;text-align:center;text-wrap:balance}
+.verse-title.plain{font-family:var(--f-display);font-weight:500}
+.imam{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);display:grid;min-width:0}
+.imam.IT{border-top:3px solid var(--lapis)} .imam.IQ{border-top:3px solid var(--saffron)}
+.imam-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 16px 4px}
+.imam-head h2{font-family:var(--f-display);font-weight:500;font-size:20px;margin:0}
+.imam.IT h2{color:var(--lapis)} .imam.IQ h2{color:var(--saffron)}
+.imam-head small{color:var(--muted);font-size:12.5px}
+.points{list-style:none;margin:0;padding:6px 16px 10px;display:grid;gap:4px}
+.pt{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.pt:last-child{border-bottom:0}
+.pt::before{content:"";width:6px;height:6px;border-radius:50%;margin-top:.95em;background:var(--muted)}
+.imam.IT .pt::before{background:var(--lapis)} .imam.IQ .pt::before{background:var(--saffron)}
+.pt-body{min-width:0;display:grid;gap:2px}
+.quote{font-family:var(--f-read);font-size:18px;line-height:2;margin:0;max-width:65ch;overflow-wrap:anywhere}
+.cite{font:inherit;font-size:12.5px;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;justify-self:start;text-align:start}
+.cite:hover{color:var(--ink);text-decoration:underline}
+.pt .full{font-family:var(--f-read);font-size:16px;line-height:1.95;color:var(--muted);margin:4px 0 0;max-width:65ch;border-inline-start:2px solid var(--line);padding-inline-start:10px;overflow-wrap:anywhere}
+.none{padding:6px 16px 14px;color:var(--muted);margin:0;max-width:62ch}
+.drawer-btn{font:inherit;font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
+  background:var(--paper);border:0;border-top:1px solid var(--line);padding:12px 16px;cursor:pointer;color:var(--ink);border-radius:0 0 var(--r) var(--r);text-align:start}
+.drawer-btn span{font-weight:400;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.drawer-btn[aria-expanded="true"]{border-radius:0}
+.drawer{border-top:1px solid var(--line);padding:12px 16px 16px;display:grid;gap:14px}
+.drawer h3{font-family:var(--f-display);font-weight:500;font-size:16px;margin:4px 0 0}
+.drawer .hint{font-size:13px;color:var(--muted);margin:-8px 0 0;max-width:62ch}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted)}
+
+/* Passages */
+.list{display:grid;gap:12px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;gap:8px;min-width:0}
+.drawer .card{background:var(--paper)}
+.card.IT{border-inline-start:3px solid var(--lapis)} .card.IQ{border-inline-start:3px solid var(--saffron)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13px;color:var(--muted)}
+.meta .who{font-weight:600}
+.card.IT .who{color:var(--lapis)} .card.IQ .who{color:var(--saffron)}
+.meta .book{color:var(--ink);font-weight:500}
+.meta .ref{font-variant-numeric:tabular-nums}
+.hdr{font-family:var(--f-read);font-weight:700;font-size:15.5px;margin:0}
+.text{font-family:var(--f-read);font-size:17.5px;line-height:2.05;margin:0;max-width:65ch;overflow-wrap:anywhere}
+.text.clamp{display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
+.ctx{font-family:var(--f-read);font-size:16px;line-height:1.95;color:var(--muted);margin:0;max-width:65ch;border-inline-start:2px solid var(--line);padding-inline-start:10px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+mark{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 1px}
+.q{color:var(--lapis)}
+.actions{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
+.actions button,.actions a{font:inherit;background:none;border:0;padding:2px 0;color:var(--lapis);cursor:pointer;text-decoration:none}
+.card.IQ .actions button,.card.IQ .actions a{color:var(--saffron)}
+.actions button:hover,.actions a:hover{text-decoration:underline}
+.also{font-size:12.5px;color:var(--muted)}
+.more{justify-self:center;font:inherit;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:16px;color:var(--muted);text-align:center}
+details.about{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;font-size:14px}
+details.about summary{cursor:pointer;font-weight:600}
+details.about li{max-width:68ch;color:var(--muted)}
+details.about ul{padding-inline-start:20px;margin:6px 0}
+.toast{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:20}
+.toast span{background:var(--ink);color:var(--paper);padding:7px 14px;border-radius:99px;font-size:13px}
+@media (max-width:520px){.quote{font-size:17px}.text{font-size:16.5px}}
+@media (prefers-reduced-motion:no-preference){.drawer,.card{animation:in .18s ease-out both}@keyframes in{from{transform:translateY(3px)}to{transform:none}}}
+</style>
+<style>
+/* additions for multi-surah navigation */
+.surah-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.surah-pick select{font:inherit;font-family:var(--f-display);font-size:18px;padding:7px 14px;border-radius:12px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);min-width:min(260px,100%);flex:1 1 220px;max-width:340px}
+.surah-pick button{font:inherit;font-family:var(--f-ui);font-size:14px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.surah-pick button:disabled{opacity:.4;cursor:default}
+.surah-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.surah-tabs button{font:inherit;font-family:var(--f-display);font-size:17px;padding:6px 16px;border-radius:99px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.surah-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px;padding:12px 16px}
+.grid button{font:inherit;font-size:13.5px;font-variant-numeric:tabular-nums;padding:6px 0;border-radius:6px;border:1px solid var(--line);background:var(--sheet);color:var(--muted);cursor:pointer;position:relative}
+.grid button.has{color:var(--ink);font-weight:600}
+.grid button.sum::after{content:"";position:absolute;top:4px;inset-inline-start:4px;width:5px;height:5px;border-radius:50%;background:var(--saffron)}
+.grid button[aria-pressed="true"]{background:var(--lapis-soft);border-color:var(--lapis);color:var(--lapis)}
+.grid-legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:0 16px 12px;font-size:12.5px;color:var(--muted)}
+.grid-legend i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--saffron);margin-inline-end:6px;vertical-align:middle}
+.nav{display:flex;justify-content:space-between;gap:8px}
+.nav button{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.nav button:disabled{opacity:.4;cursor:default}
+.loading{padding:24px;text-align:center;color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted)}
+:root{--ok:#2f6b3f;--ok-soft:#e5f1e8;--no:#9b2c2c;--no-soft:#f7e4e4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}}
+:root[data-theme="dark"]{--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}
+.nuq{border-top:1px dashed var(--line);padding:10px 16px 12px;display:grid;gap:8px}
+.nuq h3{font-family:var(--f-display);font-weight:500;font-size:15.5px;margin:0;color:var(--muted)}
+.nq{display:grid;gap:3px;padding:6px 0;border-bottom:1px dotted var(--line);min-width:0}
+.nq:last-child{border-bottom:0}
+.nq-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.nq-who{font-weight:600;font-size:14px}
+.st{font-size:12px;padding:0 8px;border-radius:99px;background:var(--lapis-soft);color:var(--lapis)}
+.st.ok{background:var(--ok-soft);color:var(--ok)} .st.no{background:var(--no-soft);color:var(--no)}
+.nq-q{font-family:var(--f-read);font-size:17px;line-height:1.95;margin:0;max-width:65ch;overflow-wrap:anywhere}
+.nq-r{font-family:var(--f-read);font-size:15.5px;line-height:1.9;margin:0;max-width:65ch;color:var(--muted);overflow-wrap:anywhere}
+.nq-r b{font-family:var(--f-ui);font-weight:600;font-size:13px;color:var(--ink)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>تفسير الشيخين</h1>
+    <p class="lede">معاني القرآن بكلام شيخ الإسلام ابن تيمية وتلميذه ابن القيم: مختصر لكل آية بنص كلامهما، ثم النصوص كاملة لمن يذاكر أو يطلب الدقائق.</p>
+    <div class="surah-pick">
+      <button type="button" id="sprev">→ السابقة</button>
+      <select id="ssel" aria-label="اختر السورة"></select>
+      <button type="button" id="snext">التالية ←</button>
+    </div>
+  </header>
+
+  <section class="surah" aria-label="آيات السورة">
+    <div class="surah-head"><b id="sname">سورة الفاتحة</b><span id="shint">اختر آية</span></div>
+    <div id="ayat"></div>
+  </section>
+
+  <div class="controls">
+    <div class="search"><input id="q" type="search" autocomplete="off" aria-label="بحث في نصوص السورة"></div>
+    <div class="row">
+      <div class="seg" role="group" aria-label="الإمام">
+        <button id="a-all" data-a="" aria-pressed="true">الشيخان</button><button id="a-IT" data-a="IT" aria-pressed="false">ابن تيمية</button><button id="a-IQ" data-a="IQ" aria-pressed="false">ابن القيم</button>
+      </div>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <main id="main" class="wrap" style="gap:16px"><div class="loading">جارٍ تحميل النصوص…</div></main>
+
+  <details class="about">
+    <summary>عن المصادر وطريقة الجمع</summary>
+    <ul>
+      <li>المختصر جمل منقولة بنصها من كتب الشيخين، لم يُغيَّر فيها حرف، وتحت كل جملة موضعها بالجزء والصفحة. اضغط الموضع لتقرأ الفقرة كاملة. الآيات التي ليس لها مختصر بعدُ تجد نصوصها في قسم الاستفاضة.</li>
+      <li>النصوص من المكتبة الشاملة كما حفظتها مدوّنة OpenITI، والإحالة إلى الطبعة المذكورة تحت كل نص. الطبعات تختلف في الترقيم، فارجع إلى الطبعة نفسها عند التوثيق. حُذفت أرقام حواشي المحققين من النصوص.</li>
+      <li>نص الآيات من مشروع «تنزيل» (tanzil.net).</li>
+      <li>من آل عمران إلى الناس: «الأبواب» حُددت يدويًا، كل فصل بأوله وآخره والآية التي عقده لها. لابن تيمية: فصول كتاب التفسير في «مجموع الفتاوى» (ج14–17)، و«الإكليل» في آية المحكم والمتشابه، ورسائل في «جامع المسائل» و«جامع الرسائل» (منها الأنعام 14 وسورة الإنسان). ولابن القيم: «التبيان في أقسام القرآن» في سور الأقسام، و«الرسالة التبوكية»، وتفسير المعوذتين وسورة الكافرون وآيتي الأعراف 55–56 في «بدائع الفوائد». أما الفصل الذي عقده لآية أخرى وذكر فيه آية عرضًا فيظهر في المواضع المتفرقة لا في الأبواب.</li>
+      <li>«أبواب السورة» هي المواضع التي أفرداها للسورة أو لآية منها: صدر «مدارج السالكين» وتفسير الفاتحة والبقرة في «مجموع الفتاوى» (ج14)، و«العشرون مسألة» في «بدائع الفوائد»، والفصول التي في عناوينها اسم آية.</li>
+      <li>في الفاتحة رُصدت المواضع بألفاظ الآيات وأسماء السورة. وفي البقرة رُبط كل استشهاد في كتبهما بآيته بمطابقة نصه على المصحف، فإذا كان اللفظ مشتركًا بين سورتين لم يُنسب إلا إذا ذكر المحقق اسم السورة. لذلك قد تفوت مواضع ذكر فيها الشيخ الآية بغير قوسين، أو تكلم عن معناها دون لفظها.</li>
+      <li>المواضع المتفرقة مفروزة آليًا: ما فيه شرح أو تكرار للآية أو كلام متصل عليها يظهر مباشرة، والاستشهاد العابر مخفي ويمكن إظهاره. هذا الفرز تقريبي ويحتاج مراجعة.</li>
+      <li>«اجتماع الجيوش الإسلامية» لابن القيم أكثره نقول عن الأئمة قبله، فلم يُؤخذ منه شيء في المختصر.</li>
+      <li>«ما نقله عن غيره»: أقوال الصحابة والتابعين والمفسرين وأهل اللغة التي أوردها الإمام في كلامه على الآية، بلفظها كما نقلها، ومعها موقفه منها (أقرّه، رجّحه، ردّه، وجّهه، حكاه دون ترجيح، استشهد به) وتعقيبه بنصه إن وُجد. تُركت النقول التي لا تضيف معنى، والأحاديث المرفوعة. الموقف تقدير من قراءة السياق، فاقرأ الفقرة كاملة عند التوثيق.</li>
+      <li>ما نقله ابن القيم عن شيخه سماعًا معروض تحت ابن تيمية كما جاء في «المستدرك على مجموع الفتاوى».</li>
+      <li>لم تُدخل المجاميع المتأخرة مثل «بدائع التفسير» و«دقائق التفسير» و«التفسير القيم»، لأن مادتها منقولة من الكتب الأصلية المعروضة هنا.</li>
+    </ul>
+  </details>
+</div>
+<div class="toast" id="toast" hidden><span></span></div>
+
+<script>
+(function(){
+const NAME = {IT:'ابن تيمية', IQ:'ابن القيم'};
+const FULL = {IT:'شيخ الإسلام ابن تيمية', IQ:'الإمام ابن القيم'};
+const SURAHS = {1:{name:'الفاتحة', file:'s1.json'}};
+const NAMES = ["الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس","هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه","الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم","لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر","فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق","الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة","الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج","نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس","التكوير","الانفطار","المطففين","الانشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد","الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات","القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر","المسد","الإخلاص","الفلق","الناس"];
+NAMES.forEach((name, k) => { const n = k + 1; if (n > 1) SURAHS[n] = {name, file:'s'+n+'.json', inc:'s'+n+'i.json', ctx:'c'+n+'.json'}; });
+const EXAMPLES = {1:'الاستعانة، المغضوب', 2:'الغيب، الأمثال، الكرسي', 3:'الشهادة، المحكم، التأويل', 4:'الشفاعة، الحسنة، السيئة', 5:'الولاية، الحكم، العقود', 6:'الأجل، التوحيد، الهدى', 7:'الميثاق، الاستواء، الزينة', 8:'الأنفال، الغنيمة، الاستجابة', 9:'التوبة، النفاق، الجزية'};
+const FATIHA_KEYS = [null, ['بسم الله الرحمن الرحيم','البسمله'], ['الحمد لله رب العالمين','الحمد'], ['الرحمن الرحيم','الرحمن'], ['مالك يوم الدين','ملك يوم الدين'], ['اياك نعبد','اياك نستعين'], ['اهدنا الصراط المستقيم','الصراط المستقيم'], ['انعمت عليهم','المغضوب عليهم','الضالين']];
+const SURAH_TERMS = ['الفاتحه','فاتحه الكتاب','ام القران','السبع المثاني'];
+const RANK = {MadarijSalikin:0, MajmucFatawa:0, BadaicFawaid:1, Salat:2, RisalaIlaAhadIkhwan:3};
+const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+// ---------- Arabic text helpers ----------
+const STRIP = /[ً-ْٰـ]/;
+function normChar(c){ if ('إأآٱ'.includes(c)) return 'ا'; if (c==='ى') return 'ي'; if (c==='ة') return 'ه'; if (c==='ؤ') return 'و'; if (c==='ئ') return 'ي'; return c; }
+function normMap(s){ let out='', map=[]; for (let i=0;i<s.length;i++){ const c=s[i]; if (STRIP.test(c)) continue; out+=normChar(c); map.push(i); } return {out, map}; }
+function norm(s){ return normMap(s).out; }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function highlight(text, terms){
+  const {out, map} = normMap(text);
+  const ranges = [];
+  for (const t of terms){ if (!t) continue; let i = out.indexOf(t);
+    while (i !== -1){ ranges.push([map[i], map[i + t.length - 1] + 1]); i = out.indexOf(t, i + t.length); } }
+  const re = /\{[^{}]*\}/g; let m; const qs = [];
+  while ((m = re.exec(text))) qs.push([m.index, m.index + m[0].length]);
+  if (!ranges.length && !qs.length) return esc(text);
+  ranges.sort((a,b) => a[0]-b[0]);
+  const merged = [];
+  for (const r of ranges){ const last = merged[merged.length-1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push(r.slice()); }
+  const ev = [];
+  merged.forEach(([s,e]) => { ev.push([s,'m',1]); ev.push([e,'/m',0]); });
+  qs.forEach(([s,e]) => { ev.push([s,'q',2]); ev.push([e,'/q',-1]); });
+  ev.sort((a,b) => a[0]-b[0] || a[2]-b[2]);
+  let html = '', pos = 0, openQ = false;
+  for (const [p, tag] of ev){
+    html += esc(text.slice(pos, p)); pos = p;
+    if (tag === 'm'){ if (openQ) html += '</span>'; html += '<mark>'; if (openQ) html += '<span class="q">'; }
+    else if (tag === '/m'){ if (openQ) html += '</span>'; html += '</mark>'; if (openQ) html += '<span class="q">'; }
+    else if (tag === 'q'){ html += '<span class="q">'; openQ = true; }
+    else { html += '</span>'; openQ = false; }
+  }
+  return html + esc(text.slice(pos));
+}
+// words of a verse used for highlighting inside long passages
+function verseTerms(S, v){
+  if (S.surah === 1) return v ? FATIHA_KEYS[v] : SURAH_TERMS;
+  const w = norm(S.verses[v-1]).replace(/[^ء-ي ]/g,'').split(/\s+/).filter(Boolean);
+  return w.length > 4 ? [w.slice(0,4).join(' ')] : [w.join(' ')];
+}
+
+// ---------- data loading ----------
+const cache = {}, extra = {};
+async function load(s){
+  if (cache[s]) return cache[s];
+  const res = await fetch(SURAHS[s].file);
+  if (!res.ok) throw new Error('fetch ' + res.status);
+  const D = await res.json();
+  D.byId = new Map(D.recs.map(r => [r.id, r]));
+  cache[s] = D; return D;
+}
+async function loadExtra(s, key){
+  const k = s + key;
+  if (extra[k]) return extra[k];
+  const res = await fetch(SURAHS[s][key]); const j = await res.json();
+  extra[k] = j;
+  if (key === 'inc'){ const D = cache[s]; j.forEach(r => { r.inc = 1; D.byId.set(r.id, r); }); }
+  return j;
+}
+
+// ---------- state ----------
+const state = {s:1, ay:0, a:'', q:'', open:{IT:false,IQ:false}, inc:{IT:false,IQ:false}, shown:{IT:{c:20,s:20},IQ:{c:20,s:20}}, qshown:25};
+const main = document.getElementById('main'), status = document.getElementById('status');
+const qEl = document.getElementById('q');
+
+function resetVerseState(){ state.open={IT:false,IQ:false}; state.shown={IT:{c:20,s:20},IQ:{c:20,s:20}}; }
+
+async function go(s, v, scroll){
+  if (state.s !== s){ state.s = s; state.inc = {IT:false,IQ:false}; }
+  state.ay = v; resetVerseState();
+  if (state.q){ state.q=''; qEl.value=''; }
+  ssel.value = String(s); sprev.disabled = s === 1; snext.disabled = s === 114;
+  document.getElementById('sname').textContent = 'سورة ' + SURAHS[s].name;
+  qEl.placeholder = 'ابحث في نصوص سورة ' + SURAHS[s].name + '…' + (EXAMPLES[s] ? ' مثال: ' + EXAMPLES[s] : '');
+  try { history.replaceState(null, '', '#s' + s + 'a' + v); } catch(e){}
+  if (!cache[s]){ main.innerHTML = '<div class="loading">جارٍ تحميل نصوص سورة ' + SURAHS[s].name + '…</div>'; }
+  let S;
+  try { S = await load(s); } catch(e){ main.innerHTML = '<div class="empty">تعذّر تحميل النصوص. أعد تحميل الصفحة.</div>'; return; }
+  buildIndex(S);
+  render();
+  if (scroll) main.scrollIntoView({behavior: (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth', block:'start'});
+}
+
+// ---------- verse index ----------
+function buildIndex(S){
+  const box = document.getElementById('ayat'); box.innerHTML = '';
+  const hint = document.getElementById('shint');
+  if (S.surah === 1){
+    hint.textContent = 'اختر آية';
+    const labels = ['الكلام على السورة عامة'].concat(S.verses);
+    labels.forEach((txt, v) => {
+      const b = document.createElement('button');
+      b.className = 'ayah'; b.setAttribute('aria-pressed', String(v === state.ay));
+      b.innerHTML = '<span class="no">' + (v ? '﴿' + AR(v) + '﴾' : '') + '</span><span class="txt' + (v ? '' : ' plain') + '">' + esc(txt) + '</span>';
+      b.addEventListener('click', () => go(1, v, true));
+      box.appendChild(b);
+    });
+    return;
+  }
+  hint.textContent = AR(S.verses.length) + ' آية';
+  const has = new Set(), sum = new Set();
+  S.recs.forEach(r => r.ay.forEach(v => has.add(v)));
+  ['IT','IQ'].forEach(a => { Object.keys((S.summ||{})[a]||{}).forEach(v => sum.add(+v)); Object.keys((S.nuq||{})[a]||{}).forEach(v => sum.add(+v)); });
+  const g = document.createElement('div'); g.className = 'grid';
+  for (let v = 1; v <= S.verses.length; v++){
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = AR(v);
+    b.className = (has.has(v) ? 'has' : '') + (sum.has(v) ? ' sum' : '');
+    b.setAttribute('aria-pressed', String(v === state.ay));
+    b.setAttribute('aria-label', 'الآية ' + v + (sum.has(v) ? '، لها مختصر' : ''));
+    b.addEventListener('click', () => go(S.surah, v, true));
+    g.appendChild(b);
+  }
+  box.appendChild(g);
+  box.insertAdjacentHTML('beforeend', '<div class="grid-legend"><span><i></i>لها مختصر أو نقول</span><span>الأرقام الداكنة: لها نصوص للمذاكرة</span></div>');
+}
+
+const ssel = document.getElementById('ssel'), sprev = document.getElementById('sprev'), snext = document.getElementById('snext');
+NAMES.forEach((name, k) => { const o = document.createElement('option'); o.value = String(k + 1); o.textContent = AR(k + 1) + ' · ' + name; ssel.appendChild(o); });
+const goSurah = s => go(s, s === 1 ? 0 : 1, false);
+ssel.addEventListener('change', () => goSurah(+ssel.value));
+sprev.addEventListener('click', () => { if (state.s > 1) goSurah(state.s - 1); });
+snext.addEventListener('click', () => { if (state.s < 114) goSurah(state.s + 1); });
+document.querySelectorAll('[data-a]').forEach(btn => btn.addEventListener('click', () => {
+  state.a = btn.dataset.a;
+  document.querySelectorAll('[data-a]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
+  render();
+}));
+let qTimer;
+qEl.addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim(); state.qshown = 25; render(); }, 200); });
+
+// ---------- rendering ----------
+function render(){
+  const S = cache[state.s]; if (!S) return;
+  main.innerHTML = '';
+  if (state.q) return renderSearch(S);
+  status.textContent = '';
+  const v = state.ay;
+  if (S.surah !== 1){
+    const nav = document.createElement('div'); nav.className = 'nav';
+    nav.innerHTML = '<button type="button" id="prev">→ الآية السابقة</button><button type="button" id="next">الآية التالية ←</button>';
+    nav.querySelector('#prev').disabled = v <= 1; nav.querySelector('#next').disabled = v >= S.verses.length;
+    nav.querySelector('#prev').addEventListener('click', () => go(S.surah, v-1, false));
+    nav.querySelector('#next').addEventListener('click', () => go(S.surah, v+1, false));
+    main.appendChild(nav);
+  }
+  const title = document.createElement('h2');
+  title.className = 'verse-title' + (v ? '' : ' plain');
+  title.innerHTML = v ? '﴿' + esc(S.verses[v-1]) + '﴾ <span class="note">[' + SURAHS[S.surah].name + ': ' + AR(v) + ']</span>' : 'الكلام على السورة عامة';
+  main.appendChild(title);
+  (state.a ? [state.a] : ['IT','IQ']).forEach(a => main.appendChild(imamBlock(S, a, v)));
+}
+
+function shortRef(S, b, v, p){ return '«' + S.books[b].t + '» ' + (v ? AR(v) + '/' : '') + AR(p); }
+function refOf(r){ const pg = r.pe && r.pe !== r.p ? AR(r.p) + '–' + AR(r.pe) : AR(r.p); return (r.v ? 'ج' + AR(r.v) + ' ' : '') + 'ص ' + pg; }
+
+function allRecs(S){ const out = S.recs.slice(); const inc = extra[S.surah + 'inc']; if (inc) out.push(...inc); return out; }
+
+function imamBlock(S, a, v){
+  const B = S.books;
+  const el = document.createElement('section'); el.className = 'imam ' + a;
+  const pts = ((S.summ||{})[a] || {})[v] || [];
+  const rk = r => (B[r.b].w in RANK ? RANK[B[r.b].w] : 5);
+  const core = S.recs.filter(r => B[r.b].a === a && r.c && r.ay.includes(v)).sort((x,y) => rk(x)-rk(y) || x.id-y.id);
+  const scat = allRecs(S).filter(r => B[r.b].a === a && !r.c && r.ay.includes(v));
+  const visible = scat.filter(r => state.inc[a] || !r.inc);
+  el.innerHTML = '<div class="imam-head"><h2>' + FULL[a] + '</h2><small>المختصر بنص كلامه</small></div>';
+  if (pts.length){
+    const ul = document.createElement('ul'); ul.className = 'points';
+    pts.forEach(pt => ul.appendChild(pointEl(S, pt)));
+    el.appendChild(ul);
+  } else {
+    const n = core.length + visible.length;
+    el.insertAdjacentHTML('beforeend', '<p class="none">' + (n ? 'لم يُكتب مختصر هذه الآية بعدُ؛ نصوصه فيها في الاستفاضة.' : 'لم أجد له كلامًا على هذه الآية في كتبه المتاحة.') + '</p>');
+  }
+  const nq = ((S.nuq||{})[a] || {})[v] || [];
+  if (nq.length) el.appendChild(nuqEl(S, a, nq));
+  const btn = document.createElement('button');
+  btn.className = 'drawer-btn'; btn.type = 'button'; btn.setAttribute('aria-expanded', String(state.open[a]));
+  btn.innerHTML = 'للمذاكرة والدقائق: النصوص كاملة <span>' + AR(core.length + visible.length) + ' موضعًا ' + (state.open[a] ? '▴' : '▾') + '</span>';
+  btn.addEventListener('click', () => { state.open[a] = !state.open[a]; render(); });
+  el.appendChild(btn);
+  if (state.open[a]) el.appendChild(drawer(S, a, v, core, scat));
+  return el;
+}
+
+function pointEl(S, pt){
+  const li = document.createElement('li'); li.className = 'pt';
+  const label = () => shortRef(S, pt.b, pt.v, pt.p);
+  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p><button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
+  const btn = li.querySelector('.cite');
+  btn.addEventListener('click', () => {
+    let full = li.querySelector('.full');
+    if (full){ full.remove(); btn.setAttribute('aria-expanded','false'); btn.textContent = label() + ' · اقرأ الفقرة كاملة'; return; }
+    const r = S.byId.get(pt.r);
+    full = document.createElement('p'); full.className = 'full';
+    full.innerHTML = highlight(r ? r.t : (pt.ft || pt.t), [norm(pt.t)]);
+    li.querySelector('.pt-body').appendChild(full);
+    btn.setAttribute('aria-expanded','true'); btn.textContent = label() + ' · أخفِ الفقرة';
+  });
+  return li;
+}
+
+function stanceClass(s){ return /ردّه|ضعّفه/.test(s) ? 'no' : (/أقرّه|رجّحه/.test(s) ? 'ok' : ''); }
+function nuqEl(S, a, list){
+  const box = document.createElement('div'); box.className = 'nuq';
+  box.innerHTML = '<h3>ما نقله عن غيره' + (a === 'IT' ? '' : '') + '</h3>';
+  list.forEach(n => {
+    const it = document.createElement('div'); it.className = 'nq';
+    const ref = shortRef(S, n.b, n.v, n.p);
+    it.innerHTML = '<div class="nq-head"><span class="nq-who">' + esc(n.who) + '</span><span class="st ' + stanceClass(n.st) + '">' + esc(n.st) + '</span></div>' +
+      '<p class="nq-q">«' + highlight(n.t, []) + '»</p>' +
+      (n.rt ? '<p class="nq-r"><b>تعقيب ' + NAME[a] + ':</b> ' + highlight(n.rt, []) + '</p>' : '') +
+      '<button type="button" class="cite">' + esc(ref) + ' · اقرأ الفقرة كاملة</button>';
+    const b = it.querySelector('.cite');
+    b.addEventListener('click', () => {
+      let full = it.querySelector('.full');
+      if (full){ full.remove(); b.textContent = ref + ' · اقرأ الفقرة كاملة'; return; }
+      const r = S.byId.get(n.r); const r2 = n.rr && n.rr !== n.r ? S.byId.get(n.rr) : null;
+      full = document.createElement('p'); full.className = 'full';
+      full.innerHTML = highlight((r ? r.t : (n.ft || n.t)) + (r2 ? ' … ' + r2.t : ''), [norm(n.t)].concat(n.rt ? [norm(n.rt)] : []));
+      it.appendChild(full); b.textContent = ref + ' · أخفِ الفقرة';
+    });
+    box.appendChild(it);
+  });
+  return box;
+}
+
+function drawer(S, a, v, core, scat){
+  const d = document.createElement('div'); d.className = 'drawer';
+  const hl = verseTerms(S, v);
+  d.insertAdjacentHTML('beforeend', '<h3>أبواب أفردها للسورة أو للآية</h3><p class="hint">مرتبة كما وردت في الكتاب، فاقرأها متتابعة.</p>');
+  const cl = document.createElement('div'); cl.className = 'list';
+  if (!core.length) cl.innerHTML = '<div class="empty">لا يوجد له في هذه الآية باب مفرد.</div>';
+  core.slice(0, state.shown[a].c).forEach(r => cl.appendChild(card(S, r, hl)));
+  d.appendChild(cl);
+  if (core.length > state.shown[a].c) d.appendChild(moreBtn(core.length - state.shown[a].c, () => { state.shown[a].c += 30; render(); }));
+  d.insertAdjacentHTML('beforeend', '<h3>مواضع متفرقة في كتبه</h3>');
+  const tg = document.createElement('label'); tg.className = 'toggle';
+  const incKnown = S.surah === 1 || extra[S.surah + 'inc'];
+  const incN = scat.filter(r => r.inc).length;
+  tg.innerHTML = '<input type="checkbox" id="inc-' + a + '"' + (state.inc[a] ? ' checked' : '') + '> أظهر الاستشهادات العابرة أيضًا' + (incKnown ? ' (' + AR(incN) + ')' : '');
+  tg.querySelector('input').addEventListener('change', async e => {
+    state.inc[a] = e.target.checked;
+    if (state.inc[a] && SURAHS[S.surah].inc && !extra[S.surah + 'inc']){ e.target.disabled = true; await loadExtra(S.surah, 'inc'); }
+    render();
+  });
+  d.appendChild(tg);
+  const list = scat.filter(r => state.inc[a] || !r.inc);
+  const sl = document.createElement('div'); sl.className = 'list';
+  if (!list.length) sl.innerHTML = '<div class="empty">لا توجد مواضع أخرى.</div>';
+  list.slice(0, state.shown[a].s).forEach(r => sl.appendChild(card(S, r, hl)));
+  d.appendChild(sl);
+  if (list.length > state.shown[a].s) d.appendChild(moreBtn(list.length - state.shown[a].s, () => { state.shown[a].s += 30; render(); }));
+  return d;
+}
+function moreBtn(left, fn){ const b = document.createElement('button'); b.className = 'more'; b.type = 'button'; b.textContent = 'عرض المزيد (' + AR(left) + ' باقية)'; b.addEventListener('click', fn); return b; }
+
+function card(S, r, hl){
+  const bk = S.books[r.b];
+  const el = document.createElement('article'); el.className = 'card ' + bk.a;
+  const also = (r.also || []).map(([b,v,p]) => S.books[b].t + ' ' + (v ? 'ج' + AR(v) + ' ' : '') + 'ص ' + AR(p));
+  const tags = r.ay.slice(0, 8).map(v => '<span class="tag">' + (v ? 'الآية ' + AR(v) : 'السورة عامة') + '</span>');
+  el.innerHTML =
+    '<div class="meta"><span class="who">' + NAME[bk.a] + '</span><span class="book">' + esc(bk.t) + '</span><span class="ref">' + refOf(r) + '</span></div>' +
+    (r.h && !/^المجلد/.test(r.h) ? '<p class="hdr">' + esc(r.h.replace(/^\[|\]$/g,'')) + '</p>' : '') +
+    '<p class="text">' + highlight(r.t, hl) + '</p>' +
+    (state.q ? '<div class="tags">' + tags.join('') + '</div>' : '') +
+    (also.length ? '<div class="also">ورد أيضًا في: ' + esc(also.join('؛ ')) + '</div>' : '') +
+    (bk.w === 'IjtimacJuyush' ? '<div class="also">تنبيه: أكثر هذا الكتاب نقول عن الأئمة قبله، فتحقق من قائل النص.</div>' : '') +
+    '<div class="actions"></div>';
+  const text = el.querySelector('.text'), acts = el.querySelector('.actions');
+  if (r.t.length > 650){
+    text.classList.add('clamp');
+    acts.appendChild(btn('اقرأ الفقرة كاملة', b => { const c = text.classList.toggle('clamp'); b.textContent = c ? 'اقرأ الفقرة كاملة' : 'اختصر'; }));
+  }
+  if (r.cb || r.ca || r.x){
+    acts.appendChild(btn('أظهر السياق', async b => {
+      let ctx = el.querySelectorAll('.ctx');
+      if (!ctx.length){
+        let cb = r.cb, ca = r.ca;
+        if (r.x){ b.textContent = 'جارٍ التحميل…'; const C = await loadExtra(S.surah, 'ctx'); [cb, ca] = C[r.id] || ['','']; }
+        if (cb) text.insertAdjacentHTML('beforebegin', '<p class="ctx">' + esc(cb) + '</p>');
+        if (ca) text.insertAdjacentHTML('afterend', '<p class="ctx">' + esc(ca) + '</p>');
+        b.textContent = 'أخفِ السياق'; return;
+      }
+      const show = ctx[0].hidden; ctx.forEach(c => c.hidden = !show); b.textContent = show ? 'أخفِ السياق' : 'أظهر السياق';
+    }));
+  }
+  acts.appendChild(btn('نسخ مع الإحالة', () => copy(r.t + '\n\n— ' + NAME[bk.a] + '، «' + bk.t + '» ' + refOf(r) + (bk.ed ? ' (ط. ' + bk.ed + ')' : ''))));
+  if (bk.sh){ const a = document.createElement('a'); a.href = 'https://shamela.ws/book/' + bk.sh; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'الكتاب في الشاملة'; acts.appendChild(a); }
+  if (bk.ed){ const s = document.createElement('div'); s.className = 'also'; s.textContent = 'الطبعة: ' + bk.ed; el.appendChild(s); }
+  return el;
+}
+function btn(label, fn){ const b = document.createElement('button'); b.type='button'; b.textContent = label; b.addEventListener('click', () => fn(b)); return b; }
+
+function renderSearch(S){
+  const recs = allRecs(S);
+  if (!S._norm || S._norm.length !== recs.length) S._norm = recs.map(r => norm(r.t + ' ' + r.h));
+  const terms = norm(state.q).split(/\s+/).filter(Boolean);
+  const res = [];
+  recs.forEach((r, i) => { if (state.a && S.books[r.b].a !== state.a) return; if (terms.every(t => S._norm[i].includes(t))) res.push(r); });
+  res.sort((x,y) => (y.c?1:0)-(x.c?1:0) || (x.inc?1:0)-(y.inc?1:0) || x.id - y.id);
+  status.textContent = AR(res.length) + ' موضعًا في سورة ' + SURAHS[S.surah].name + ' فيها «' + state.q + '»' + (state.a ? ' · ' + NAME[state.a] : '');
+  const head = document.createElement('div'); head.className = 'row';
+  head.innerHTML = '<button type="button" class="more">← رجوع إلى الآية</button>';
+  head.querySelector('button').addEventListener('click', () => { state.q=''; qEl.value=''; render(); });
+  main.appendChild(head);
+  const list = document.createElement('div'); list.className = 'list';
+  if (!res.length) list.innerHTML = '<div class="empty">لا توجد نتائج. جرّب كلمة أقصر.</div>';
+  res.slice(0, state.qshown).forEach(r => list.appendChild(card(S, r, terms)));
+  main.appendChild(list);
+  if (res.length > state.qshown) main.appendChild(moreBtn(res.length - state.qshown, () => { state.qshown += 25; render(); }));
+}
+
+function toast(msg){ const t = document.getElementById('toast'); t.firstElementChild.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 1600); }
+function copy(s){
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('نُسخ النص'); } catch(e){ toast('حدّد النص وانسخه يدويًا'); } ta.remove(); };
+  try { navigator.clipboard.writeText(s).then(() => toast('نُسخ النص مع الإحالة'), fallback); } catch(e){ fallback(); }
+}
+
+const m = /^#s(\d{1,3})a(\d{1,3})$/.exec(location.hash || '') || /^#a([0-7])$/.exec(location.hash || '');
+if (m && m.length === 3 && SURAHS[+m[1]]) go(+m[1], +m[2], false);
+else if (m) go(1, +m[1], false);
+else go(1, 0, false);
+})();
+</script>

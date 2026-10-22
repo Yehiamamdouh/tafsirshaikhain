@@ -1,0 +1,141 @@
+// ===== public-site additions: whole-mushaf search, verse link, offline =====
+state.scope = 'all';
+(function scopeToggle(){
+  const box = document.querySelector('.search');
+  const sel = document.createElement('select');
+  sel.id = 'scope'; sel.setAttribute('aria-label', 'نطاق البحث');
+  sel.innerHTML = '<option value="all">في المصحف كله</option><option value="surah">في هذه السورة</option>';
+  sel.addEventListener('change', () => { state.scope = sel.value; if (state.q) render(); updatePh(); });
+  box.appendChild(sel);
+})();
+function updatePh(){
+  qEl.placeholder = state.scope === 'all'
+    ? 'ابحث في المختصرات والنقول في المصحف كله…'
+    : 'ابحث في نصوص سورة ' + SURAHS[state.s].name + '…';
+}
+const _go = go;
+go = async function(s, v, scroll){ await _go(s, v, scroll); updatePh(); };
+
+let SEARCH = null, SEARCHN = null;
+async function loadSearch(){
+  if (SEARCH) return SEARCH;
+  const r = await fetch('search.json'); SEARCH = await r.json();
+  SEARCHN = SEARCH.map(e => norm((e[3] ? e[4] + ' ' + e[5] : e[4])));
+  return SEARCH;
+}
+const _renderSearch = renderSearch;
+renderSearch = function(S){
+  if (state.scope !== 'all') return _renderSearch(S);
+  main.innerHTML = '<div class="loading">جارٍ البحث في المصحف كله…</div>';
+  loadSearch().then(() => {
+    const terms = norm(state.q).split(/\s+/).filter(Boolean);
+    const res = [];
+    SEARCH.forEach((e, i) => { if (state.a && e[2] !== state.a) return; if (terms.every(t => SEARCHN[i].includes(t))) res.push(e); });
+    main.innerHTML = '';
+    status.textContent = AR(res.length) + ' نتيجة في المصحف كله فيها «' + state.q + '»' + (state.a ? ' · ' + NAME[state.a] : '');
+    const head = document.createElement('div'); head.className = 'row';
+    head.innerHTML = '<button type="button" class="more">← رجوع إلى الآية</button>';
+    head.querySelector('button').addEventListener('click', () => { state.q=''; qEl.value=''; render(); });
+    main.appendChild(head);
+    const list = document.createElement('div'); list.className = 'list';
+    if (!res.length) list.innerHTML = '<div class="empty">لا توجد نتائج في المختصرات والنقول. جرّب «في هذه السورة» للبحث في النصوص الكاملة.</div>';
+    res.slice(0, state.qshown).forEach(e => {
+      const [s, v, a, isN] = e;
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'gres';
+      el.innerHTML = '<span class="gres-h">سورة ' + esc(SURAHS[s].name) + ' · الآية ' + AR(v) + ' · ' + NAME[a] + ' · ' + (isN ? 'نقل عن ' + esc(e[4]) : 'مختصر') + '</span>'
+        + '<span class="gres-t">' + highlight(isN ? e[5] : e[4], terms) + '</span>';
+      el.addEventListener('click', () => { state.q=''; qEl.value=''; go(s, v, true); });
+      list.appendChild(el);
+    });
+    main.appendChild(list);
+    if (res.length > state.qshown) main.appendChild(moreBtn(res.length - state.qshown, () => { state.qshown += 25; render(); }));
+  }).catch(() => { main.innerHTML = '<div class="empty">تعذّر تحميل فهرس البحث.</div>'; });
+};
+
+// copy-link button for the current verse
+const _render = render;
+render = function(){
+  _render();
+  if (state.q || !cache[state.s]) return;
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'linkbtn sharebtn';
+  b.textContent = 'انسخ رابط الآية';
+  b.addEventListener('click', () => {
+    const url = location.origin + location.pathname + '#s' + state.s + 'a' + state.ay;
+    const done = () => toast('نُسخ رابط الآية');
+    try { navigator.clipboard.writeText(url).then(done, () => prompt('انسخ الرابط:', url)); } catch(e){ prompt('انسخ الرابط:', url); }
+  });
+  main.prepend(b);
+};
+window.addEventListener('hashchange', () => {
+  const m2 = /^#s(\d{1,3})a(\d{1,3})$/.exec(location.hash || '');
+  if (m2 && SURAHS[+m2[1]] && (+m2[1] !== state.s || +m2[2] !== state.ay)) go(+m2[1], +m2[2], true);
+});
+
+// offline: service worker + "save everything"
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+const dl = document.getElementById('dlall');
+if (dl) dl.addEventListener('click', async () => {
+  if (!confirm('سيُحفظ نص المختصرات والنصوص الرئيسية لكل السور (نحو ٧٠ ميجا) لتعمل دون إنترنت. متابعة؟')) return;
+  dl.disabled = true;
+  const files = ['search.json'];
+  for (let n = 1; n <= 114; n++) files.push('s' + n + '.json');
+  let done = 0;
+  for (const f of files){
+    try { await fetch(f, {cache: 'reload'}); } catch(e){}
+    done++; dl.textContent = 'جارٍ الحفظ… ' + AR(Math.round(done * 100 / files.length)) + '٪';
+  }
+  dl.textContent = 'حُفظ المصحف كله للقراءة دون إنترنت';
+});
+updatePh();
+
+// ===== translations: verse meaning (QuranEnc) + approximate translation of summaries =====
+const TRV = {}, TRS = {};
+function fnv(s){ s = s.replace(/\s+/g, ' ').trim(); let h = 0x811c9dc5; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); }
+function curLang(){ return (window.I18N && I18N.lang) || 'ar'; }
+async function ensureTr(l, s){
+  const kv = l + s;
+  if (!TRV[kv]) TRV[kv] = await fetch('tr/' + l + '/' + s + '.json').then(r => r.json()).catch(() => []);
+  if (!TRS[l]) TRS[l] = await fetch('st/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+}
+function trBlock(text, cls, l){
+  const p = document.createElement('p'); p.className = cls; p.setAttribute('dir', (I18N.meta && I18N.meta[l] && I18N.meta[l].dir) || 'auto'); p.setAttribute('lang', l);
+  p.textContent = text; return p;
+}
+const _render2 = render;
+render = function(){
+  _render2();
+  const l = curLang(); if (l === 'ar' || state.q) return;
+  const s = state.s, v = state.ay;
+  if (!TRV[l + s] || !TRS[l]){ ensureTr(l, s).then(() => { if (state.s === s && curLang() === l) render(); }); return; }
+  const m = (I18N.meta || {})[l] || {};
+  const vt = document.querySelector('.verse-title');
+  if (vt && v && TRV[l + s][v - 1]){
+    const [t, fn] = TRV[l + s][v - 1];
+    const box = document.createElement('div'); box.className = 'tr-verse';
+    box.innerHTML = '<span class="tr-label">ترجمة معاني الآية</span>';
+    box.appendChild(trBlock(t, 'tr-text', l));
+    if (fn){ const d = document.createElement('details'); d.innerHTML = '<summary>…</summary>'; d.appendChild(trBlock(fn, 'tr-fn', l)); box.appendChild(d); }
+    const cr = document.createElement('a'); cr.className = 'tr-credit'; cr.href = m.url || 'https://quranenc.com'; cr.target = '_blank'; cr.rel = 'noopener';
+    cr.textContent = (m.title || '') + ' — v' + (m.version || '') + ' · QuranEnc.com'; cr.setAttribute('dir', 'ltr');
+    box.appendChild(cr);
+    vt.after(box);
+  }
+  const map = TRS[l] || {};
+  let any = false;
+  document.querySelectorAll('.pt .quote, .nq-q').forEach(q => {
+    const t = q.textContent.replace(/^«|»$/g, '');
+    const tr = map[fnv(t)]; if (!tr) return;
+    any = true; q.after(trBlock(tr, 'tr-sum', l));
+  });
+  if (any && !document.querySelector('.tr-note')){
+    const n = document.createElement('p'); n.className = 'tr-note tr-label'; n.textContent = 'ترجمة تقريبية للمختصر — النص العربي هو المرجع';
+    const first = document.querySelector('.imam'); if (first) first.before(n);
+  }
+};
+if (window.I18N) I18N.onChange.push(() => render());
+
+// start a search from ?q= (home page search box)
+(function(){ const q0 = new URLSearchParams(location.search).get('q'); if (q0){ qEl.value = q0; state.q = q0; state.qshown = 25; setTimeout(() => render(), 300); } })();
+
+// verse finder on the tafsir search box
+if (window.attachVerseFinder) attachVerseFinder(qEl, (s, v) => { state.q = ''; qEl.value = ''; go(s, v, true); });
