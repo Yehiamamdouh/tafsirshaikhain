@@ -5,6 +5,7 @@ REPO=sys.argv[1]; P=REPO+'/public'; BASE='https://tafsirshaikhain.com'
 E=lambda s: html.escape(str(s), quote=True)
 CH=json.load(open(T+'/data/chapters.json'))['chapters']
 QA=json.load(open(T+'/data/simple.json'))
+GA=open(T+'/ga.html').read().replace('{{GA_ID}}',os.environ.get('GA_ID','G-ER9F5C2HC1'))
 META=json.load(open(P+'/tr/langs.json'))
 L={
  'en':{'dir':'ltr','site':'Tafsir al-Shaykhayn','tag':'The meanings of the Qur\'an in the words of Ibn Taymiyyah and Ibn al-Qayyim',
@@ -95,7 +96,7 @@ def page(l,title,desc,path_tail,body):
             '<link rel="icon" href="/icon.svg" type="image/svg+xml">\n<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap">\n'
             '<link rel="stylesheet" href="/theme.css">\n<style>body{font-family:system-ui,"Segoe UI",sans-serif;color:var(--ink);padding:20px 16px 48px;line-height:1.6}'
-            '.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}.langs{max-width:1100px;margin:24px auto 0;font-size:14px;line-height:2;color:var(--muted)}.langs a{color:var(--lapis)}</style>\n</head>\n<body>\n'
+            '.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}.langs{max-width:1100px;margin:24px auto 0;font-size:14px;line-height:2;color:var(--muted)}.langs a{color:var(--lapis)}</style>\n'+GA+'</head>\n<body>\n'
             +body+switcher(l,path_tail)+f'<footer class="site-foot"><span>{E(t["site"])} · <a href="/{l}/">{E(t["home"])}</a> · <a href="/about.html">{E(t["about"])}</a> · <a href="/privacy.html">{E(t["privacy"])}</a></span>'
             '<a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a></footer>\n'
             f'<script>try{{localStorage.setItem("lang","{l}")}}catch(e){{}}document.addEventListener("click",function(e){{var a=e.target.closest&&e.target.closest("[data-l]");if(a)try{{localStorage.setItem("lang",a.dataset.l)}}catch(x){{}}}})</script>\n</body>\n</html>\n')
