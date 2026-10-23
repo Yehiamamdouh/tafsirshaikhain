@@ -5,6 +5,8 @@ T=os.path.dirname(os.path.abspath(__file__))          # templates + scripts (rep
 DATA=os.environ.get('TS_DATA')                         # optional: folder with fresh s*.json/c*.json/si*.json; default = use public/ as-is
 REPO=sys.argv[1]; P=os.path.join(REPO,'public'); os.makedirs(P,exist_ok=True)
 BASE='https://tafsirshaikhain.com'
+GA_ID=os.environ.get('GA_ID','G-ER9F5C2HC1')
+GA=open(T+'/ga.html').read().replace('{{GA_ID}}',GA_ID)
 SITEKEY=os.environ.get('TURNSTILE_SITEKEY','0x4AAAAAAFgr25YFTtOJHNYy')
 NAMES=json.loads(re.search(r'\["الفاتحة".*?\]',open(T+'/app.html').read()).group(0))
 AR=lambda n: str(n).translate(str.maketrans('0123456789','٠١٢٣٤٥٦٧٨٩'))
@@ -33,7 +35,7 @@ json.dump(stats,open(P+'/stats.json','w'))
 
 HEAD=open(T+'/head.html').read(); FOOT=open(T+'/footer.html').read()
 def page(title,desc,path,body,jsonld=None):
-    h=HEAD.replace('{{TITLE}}',E(title)).replace('{{DESC}}',E(desc)).replace('{{CANON}}',BASE+path)
+    h=HEAD.replace('{{TITLE}}',E(title)).replace('{{DESC}}',E(desc)).replace('{{CANON}}',BASE+path).replace('{{GA}}',GA)
     h=h.replace('{{JSONLD}}','<script type="application/ld+json">'+json.dumps(jsonld,ensure_ascii=False)+'</script>' if jsonld else '')
     return h+body+FOOT+'\n</body>\n</html>\n'
 def write(rel,txt):
