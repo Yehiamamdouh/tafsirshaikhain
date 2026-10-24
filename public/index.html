@@ -663,19 +663,38 @@ renderSearch = function(S){
   }).catch(() => { main.innerHTML = '<div class="empty">تعذّر تحميل فهرس البحث.</div>'; });
 };
 
-// copy-link button for the current verse
+// share button for the current verse (title + link only; the imams' words are never put in the share text)
 const _render = render;
 render = function(){
   _render();
   if (state.q || !cache[state.s]) return;
+  const s = state.s, v = state.ay;
+  const wrap = document.createElement('div'); wrap.className = 'sharewrap';
   const b = document.createElement('button'); b.type = 'button'; b.className = 'linkbtn sharebtn';
-  b.textContent = 'انسخ رابط الآية';
-  b.addEventListener('click', () => {
-    const url = location.origin + location.pathname + '#s' + state.s + 'a' + state.ay;
+  b.textContent = 'مشاركة';
+  const menu = document.createElement('div'); menu.className = 'sharemenu'; menu.hidden = true;
+  const hashUrl = location.origin + location.pathname + '#s' + s + 'a' + v;
+  const pageUrl = () => fetch('ayah/' + s + '-' + v + '.html', {method: 'HEAD'}).then(r => r.ok ? location.origin + '/ayah/' + s + '-' + v + '.html' : hashUrl).catch(() => hashUrl);
+  const title = 'تفسير الآية ' + AR(v) + ' من سورة ' + SURAHS[s].name + ' — ابن تيمية وابن القيم';
+  const copyLink = url => {
     const done = () => toast('نُسخ رابط الآية');
     try { navigator.clipboard.writeText(url).then(done, () => prompt('انسخ الرابط:', url)); } catch(e){ prompt('انسخ الرابط:', url); }
+  };
+  const mk = (label, fn) => { const a = document.createElement('button'); a.type = 'button'; a.textContent = label; a.addEventListener('click', async () => { const url = await pageUrl(); menu.hidden = true; fn(url); }); menu.appendChild(a); };
+  const open = u => window.open(u, '_blank', 'noopener');
+  mk('WhatsApp', url => open('https://wa.me/?text=' + encodeURIComponent(title + '\n' + url)));
+  mk('Telegram', url => open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title)));
+  mk('Facebook', url => open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url)));
+  mk('X', url => open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title)));
+  mk('نسخ الرابط', copyLink);
+  b.addEventListener('click', async () => {
+    if (navigator.share){
+      const url = await pageUrl();
+      try { await navigator.share({title: title, text: title, url: url}); } catch(e){ if (e && e.name !== 'AbortError') menu.hidden = false; }
+    } else menu.hidden = !menu.hidden;
   });
-  main.prepend(b);
+  wrap.append(b, menu);
+  main.prepend(wrap);
 };
 window.addEventListener('hashchange', () => {
   const m2 = /^#s(\d{1,3})a(\d{1,3})$/.exec(location.hash || '');

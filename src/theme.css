@@ -92,3 +92,9 @@ details.intro>summary::after{content:"▾";font-size:12px;color:var(--gold)}
 details.intro[open]>summary::after{content:"▴"}
 details.intro .shaykhs{margin-top:12px}
 .surah-pick{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center}.surah-pick select{min-width:0;width:100%}.surah-pick button{white-space:nowrap}
+
+.sharewrap{display:grid;justify-items:start;gap:6px}
+.sharemenu{display:flex;flex-wrap:wrap;gap:6px}
+.sharemenu button{font:inherit;font-size:14px;padding:6px 12px;border:1px solid var(--line,#d9dee6);border-radius:8px;background:var(--sheet,#fff);color:var(--ink,#18212e);cursor:pointer}
+.sharemenu button:hover{border-color:var(--lapis,#1f4f8f)}
+.sharemenu[hidden]{display:none}
