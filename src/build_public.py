@@ -132,7 +132,7 @@ for s in range(1,115):
         nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
               f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+relh+
-              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (النصوص كاملة)</a>'+nav+'</main>')
+              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (النصوص كاملة)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
              "mainEntityOfPage":BASE+f'/ayah/{s}-{v}.html',"image":BASE+"/og.png","about":f"سورة {name}، الآية {v}",
@@ -173,7 +173,7 @@ open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nSitemap: {BASE}/sitem
 
 # 6) static assets
 for f in ('worker.js','wrangler.jsonc'): shutil.copy2(T+'/'+f,REPO)
-for f in ('i18n.js','qsuggest.js','quran_clean.json','theme.css','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','_headers'):
+for f in ('i18n.js','qsuggest.js','share.js','quran_clean.json','theme.css','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','_headers'):
     if os.path.exists(T+'/'+f): shutil.copy2(T+'/'+f,P)
 os.makedirs(P+'/i18n',exist_ok=True); os.makedirs(P+'/st',exist_ok=True)
 for f in glob.glob(T+'/i18n/*.json'): shutil.copy2(f,P+'/i18n')
