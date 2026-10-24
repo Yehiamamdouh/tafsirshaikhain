@@ -663,7 +663,7 @@ renderSearch = function(S){
   }).catch(() => { main.innerHTML = '<div class="empty">تعذّر تحميل فهرس البحث.</div>'; });
 };
 
-// share button for the current verse (title + link only; the imams' words are never put in the share text)
+// share button for the current verse: the shared text is the verse + the imams' summary quotations verbatim, with their book refs, then the link
 const _render = render;
 render = function(){
   _render();
@@ -676,21 +676,37 @@ render = function(){
   const hashUrl = location.origin + location.pathname + '#s' + s + 'a' + v;
   const pageUrl = () => fetch('ayah/' + s + '-' + v + '.html', {method: 'HEAD'}).then(r => r.ok ? location.origin + '/ayah/' + s + '-' + v + '.html' : hashUrl).catch(() => hashUrl);
   const title = 'تفسير الآية ' + AR(v) + ' من سورة ' + SURAHS[s].name + ' — ابن تيمية وابن القيم';
+  const S = cache[s];
+  const fullText = url => {
+    const parts = ['﴿' + S.verses[v-1] + '﴾ [' + SURAHS[s].name + ': ' + AR(v) + ']'];
+    ['IT','IQ'].forEach(a => {
+      const pts = ((S.summ || {})[a] || {})[v] || [];
+      if (!pts.length) return;
+      parts.push(FULL[a] + ':\n' + pts.map(pt => pt.t + '\n— ' + shortRef(S, pt.b, pt.v, pt.p)).join('\n\n'));
+    });
+    parts.push(title + '\n' + url);
+    return parts.join('\n\n');
+  };
+  const copyText = txt => {
+    const done = () => toast('نُسخ النص مع الرابط');
+    try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ النص:', txt)); } catch(e){ prompt('انسخ النص:', txt); }
+  };
   const copyLink = url => {
     const done = () => toast('نُسخ رابط الآية');
     try { navigator.clipboard.writeText(url).then(done, () => prompt('انسخ الرابط:', url)); } catch(e){ prompt('انسخ الرابط:', url); }
   };
   const mk = (label, fn) => { const a = document.createElement('button'); a.type = 'button'; a.textContent = label; a.addEventListener('click', async () => { const url = await pageUrl(); menu.hidden = true; fn(url); }); menu.appendChild(a); };
   const open = u => window.open(u, '_blank', 'noopener');
-  mk('WhatsApp', url => open('https://wa.me/?text=' + encodeURIComponent(title + '\n' + url)));
-  mk('Telegram', url => open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title)));
+  mk('WhatsApp', url => open('https://wa.me/?text=' + encodeURIComponent(fullText(url))));
+  mk('Telegram', url => open('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(fullText(url))));
   mk('Facebook', url => open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url)));
   mk('X', url => open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(title)));
+  mk('نسخ النص مع الرابط', url => copyText(fullText(url)));
   mk('نسخ الرابط', copyLink);
   b.addEventListener('click', async () => {
     if (navigator.share){
       const url = await pageUrl();
-      try { await navigator.share({title: title, text: title, url: url}); } catch(e){ if (e && e.name !== 'AbortError') menu.hidden = false; }
+      try { await navigator.share({title: title, text: fullText(url)}); } catch(e){ if (e && e.name !== 'AbortError') menu.hidden = false; }
     } else menu.hidden = !menu.hidden;
   });
   wrap.append(b, menu);
