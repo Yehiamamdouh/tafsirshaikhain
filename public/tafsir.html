@@ -604,9 +604,7 @@ state.scope = 'all';
   box.appendChild(sel);
 })();
 function updatePh(){
-  qEl.placeholder = state.scope === 'all'
-    ? 'ابحث في المختصرات والنقول في المصحف كله…'
-    : 'ابحث في نصوص سورة ' + SURAHS[state.s].name + '…';
+  qEl.placeholder = 'اكتب الآية…';
 }
 const _go = go;
 go = async function(s, v, scroll){ await _go(s, v, scroll); updatePh(); };
