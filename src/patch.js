@@ -63,11 +63,11 @@ render = function(){
   b.textContent = 'مشاركة';
   const menu = document.createElement('div'); menu.className = 'sharemenu'; menu.hidden = true;
   const hashUrl = location.origin + location.pathname + '#s' + s + 'a' + v;
-  const pageUrl = () => fetch('ayah/' + s + '-' + v + '.html', {method: 'HEAD'}).then(r => r.ok ? location.origin + '/ayah/' + s + '-' + v + '.html' : hashUrl).catch(() => hashUrl);
-  const title = 'تفسير الآية ' + AR(v) + ' من سورة ' + SURAHS[s].name + ' — ابن تيمية وابن القيم';
+  const pageUrl = () => !v ? Promise.resolve(hashUrl) : fetch('ayah/' + s + '-' + v + '.html', {method: 'HEAD'}).then(r => r.ok ? location.origin + '/ayah/' + s + '-' + v + '.html' : hashUrl).catch(() => hashUrl);
+  const title = (v ? 'تفسير الآية ' + AR(v) + ' من سورة ' : 'كلام ابن تيمية وابن القيم على سورة ') + SURAHS[s].name + (v ? ' — ابن تيمية وابن القيم' : ' عامةً');
   const S = cache[s];
   const fullText = url => {
-    const parts = ['﴿' + S.verses[v-1] + '﴾ [' + SURAHS[s].name + ': ' + AR(v) + ']'];
+    const parts = v ? ['﴿' + S.verses[v-1] + '﴾ [' + SURAHS[s].name + ': ' + AR(v) + ']'] : [];
     ['IT','IQ'].forEach(a => {
       const pts = ((S.summ || {})[a] || {})[v] || [];
       if (!pts.length) return;
