@@ -22,6 +22,7 @@ async function langPage(req, env, url, m) {
   else if (ss) { file = ss + "_0"; key = "surah/" + ss + ".html"; }
   const r = await env.ASSETS.fetch(new Request(url.origin + "/lp/" + l + "/" + file + ".json"));
   const html = r.ok ? (await r.json())[key] : null;
+  if (!html && as && +as >= 1 && +as <= 114) return Response.redirect(url.origin + "/" + l + "/surah/" + as + ".html", 301);
   if (!html) { const nf = await env.ASSETS.fetch(new Request(url.origin + "/404.html")); return new Response(nf.body, { status: 404, headers: nf.headers }); }
   const res = new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
   if (req.method === "GET") await cache.put(req, res.clone());
@@ -37,6 +38,9 @@ export default {
     if (url.pathname.endsWith("/")) return env.ASSETS.fetch(new Request(url.origin + url.pathname + "index.html", req));
     if (url.pathname !== "/api/feedback") {
       const r = await env.ASSETS.fetch(req);
+      // a verse with no page (e.g. its summaries were moved to another verse) → its surah page
+      const av = r.status === 404 && url.pathname.match(/^\/ayah\/(\d{1,3})-\d{1,3}\.html$/);
+      if (av && +av[1] >= 1 && +av[1] <= 114) return Response.redirect(url.origin + "/surah/" + av[1] + ".html", 301);
       if (r.status !== 404 || /\.[a-z0-9]+$/i.test(url.pathname)) return r;
       // old pretty URLs (/ayah/2-255, /en) → canonical .html or directory
       for (const alt of [url.pathname + ".html", url.pathname + "/index.html"]) {

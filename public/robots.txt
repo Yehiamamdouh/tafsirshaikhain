@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: /lp/
 Allow: /
+Disallow: /api/
 Sitemap: https://tafsirshaikhain.com/sitemap.xml

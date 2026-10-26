@@ -96,6 +96,8 @@ def crumbs_ld(items):
     return {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":BASE+u} for i,(n,u) in enumerate(items)]}
 AUTH={'IT':{"@type":"Person","name":"أحمد بن عبد الحليم ابن تيمية","alternateName":"شيخ الإسلام ابن تيمية"},
       'IQ':{"@type":"Person","name":"محمد بن أبي بكر ابن قيم الجوزية","alternateName":"ابن القيم"}}
+# verse pages are regenerated from scratch so a verse whose summaries moved away doesn't keep a stale page
+shutil.rmtree(P+'/ayah',ignore_errors=True)
 urls=['/','/about.html','/privacy.html']
 pages={(s,v) for s in range(1,115) for k in ('summ','nuq') for a in ('IT','IQ') for v in map(int,SUR[s].get(k,{}).get(a,{})) if v>=1}
 BOOKS={}   # slug -> {'b':book,'v':set((s,v))}
@@ -169,7 +171,7 @@ write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<
 shutil.copy2(T+'/og.png',P)
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in urls)+'</urlset>\n'
 open(P+'/sitemap.xml','w').write(sm)
-open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n')
+open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {BASE}/sitemap.xml\n')
 
 # 6) static assets
 for f in ('worker.js','wrangler.jsonc'): shutil.copy2(T+'/'+f,REPO)
