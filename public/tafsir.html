@@ -153,6 +153,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{ou
 .hdr{font-family:var(--f-read);font-weight:700;font-size:15.5px;margin:0}
 .text{font-family:var(--f-read);font-size:17.5px;line-height:2.05;margin:0;max-width:65ch;overflow-wrap:anywhere}
 .text.clamp{display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
+.full .ctx{border:0;padding:0;display:inline;font-size:inherit;color:var(--muted)}
 .ctx{font-family:var(--f-read);font-size:16px;line-height:1.95;color:var(--muted);margin:0;max-width:65ch;border-inline-start:2px solid var(--line);padding-inline-start:10px}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
 .tag{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
@@ -461,11 +462,22 @@ function pointEl(S, pt){
   const btn = li.querySelector('.cite');
   btn.addEventListener('click', () => {
     let full = li.querySelector('.full');
-    if (full){ full.remove(); btn.setAttribute('aria-expanded','false'); btn.textContent = label() + ' · اقرأ الفقرة كاملة'; return; }
+    if (full){ full.remove(); li.querySelectorAll('.ctxbtn').forEach(x => x.remove()); btn.setAttribute('aria-expanded','false'); btn.textContent = label() + ' · اقرأ الفقرة كاملة'; return; }
     const r = S.byId.get(pt.r);
     full = document.createElement('p'); full.className = 'full';
     full.innerHTML = highlight(r ? r.t : (pt.ft || pt.t), [norm(pt.t)]);
     li.querySelector('.pt-body').appendChild(full);
+    if (r && (r.cb || r.ca || r.x)){
+      const cbtn = document.createElement('button'); cbtn.type = 'button'; cbtn.className = 'cite ctxbtn'; cbtn.textContent = 'أظهر ما قبلها وما بعدها';
+      cbtn.addEventListener('click', async () => {
+        let cb = r.cb, ca = r.ca;
+        if (r.x){ cbtn.textContent = 'جارٍ التحميل…'; const C = await loadExtra(S.surah, 'ctx'); [cb, ca] = C[r.id] || ['','']; }
+        if (cb) full.insertAdjacentHTML('afterbegin', '<span class="ctx">' + esc(cb) + ' </span>');
+        if (ca) full.insertAdjacentHTML('beforeend', '<span class="ctx"> ' + esc(ca) + '</span>');
+        cbtn.remove();
+      });
+      li.querySelector('.pt-body').appendChild(cbtn);
+    }
     btn.setAttribute('aria-expanded','true'); btn.textContent = label() + ' · أخفِ الفقرة';
   });
   return li;
@@ -773,7 +785,8 @@ if (window.attachVerseFinder) attachVerseFinder(qEl, (s, v) => { state.q = ''; q
 <link rel="stylesheet" href="/theme.css">
 <footer class="site-foot">
   <nav class="langs" aria-label="Languages" style="flex-basis:100%">🌐 <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/ur/" hreflang="ur" lang="ur">اردو</a> · <a href="/id/" hreflang="id" lang="id">Bahasa Indonesia</a> · <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a> · <a href="/fr/" hreflang="fr" lang="fr">Français</a> · <a href="/bn/" hreflang="bn" lang="bn">বাংলা</a> · <a href="/ms/" hreflang="ms" lang="ms">Bahasa Melayu</a> · <a href="/fa/" hreflang="fa" lang="fa">فارسی</a> · <a href="/ru/" hreflang="ru" lang="ru">Русский</a> · <a href="/sw/" hreflang="sw" lang="sw">Kiswahili</a> · <a href="/ha/" hreflang="ha" lang="ha">Hausa</a> · <a href="/es/" hreflang="es" lang="es">Español</a> · <a href="/de/" hreflang="de" lang="de">Deutsch</a> · <a href="/zh/" hreflang="zh" lang="zh">中文</a></nav>
-  <span>جامع تفسير الشيخين · <a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/books.html">المصادر</a> · <a href="/about.html">عن المشروع</a> · <a href="/about.html#feedback">أرسل تصويبًا</a> · <a href="/privacy.html">الخصوصية وشروط الاستخدام</a></span>
+  <p class="disc" style="flex-basis:100%;margin:0;font-size:13px">النصوص منقولة بحروفها من الطبعات المذكورة تحت كل نص؛ يُرجى الرجوع إلى الأصل عند الاستشهاد، ومن وجد خطأً فليتفضل <a href="/about.html#feedback">بإرساله</a>.</p>
+  <span>جامع تفسير الشيخين ·<a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/books.html">المصادر</a> · <a href="/about.html">عن المشروع</a> · <a href="/about.html#feedback">أرسل تصويبًا</a> · <a href="/privacy.html">الخصوصية وشروط الاستخدام</a></span>
   <a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a>
 </footer>
 
