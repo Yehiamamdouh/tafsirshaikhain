@@ -24,8 +24,8 @@ git add -A && git commit && git pull --rebase && git push   # push to main = aut
 Check pages at a 390px mobile viewport (Playwright/Chromium is available) before pushing; no horizontal scroll.
 
 ## Two sessions share this repo — coordination
-Two Claude sessions push here: the **website session** (edits `src/` only: templates, build scripts, worker, UI
-strings) and the **content session** (edits `public/s*.json` data only). Both then run the build and commit `public/`.
+Two Claude sessions push here: the **website session** (templates, build scripts, worker, UI strings in `src/`)
+and the **content session** (the data in `public/s*.json`). Both then run the build and commit `public/`.
 - **Pull first, build last:** `git pull origin main` before building, and build again right before committing, so
   `public/` is always generated from the latest `src/` + latest data. Never commit a `public/` built from an old checkout.
 - **Never hand-merge generated files.** If a pull/rebase conflicts in `public/**` or `src/data/lastmod.json`, take
@@ -33,8 +33,9 @@ strings) and the **content session** (edits `public/s*.json` data only). Both th
 - **`src/data/lastmod.json` must be committed with every build and never deleted or reset.** It holds each page's
   content hash + the date that content last changed; the sitemaps' `<lastmod>` comes from it. Deleting it would stamp
   every URL with today's date.
-- Stay in your lane: the website session never edits `public/s*.json`; the content session doesn't change `src/`
-  templates or scripts (ask the owner and leave it to the website session instead).
+- The website session never edits `public/s*.json`. The content session may touch `src/` when its work needs it
+  (e.g. about page numbers, service-worker cache); keep such changes small and pull right before editing `src/`,
+  since the website session edits the same files.
 - `build_public.py` rebuilds `public/ayah/` from scratch: a verse whose summaries move away loses its page, and the
   Worker 301-redirects that URL to its surah page. That is expected, not a bug.
 
