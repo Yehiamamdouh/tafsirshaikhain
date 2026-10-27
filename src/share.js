@@ -45,3 +45,30 @@
   wrap.append(b, menu);
   vt.insertAdjacentElement('afterend', wrap);
 })();
+
+// «انسخ بالإحالة» under each summary quotation on the static verse pages
+(function(){
+  const h1 = document.querySelector('main.sp h1'); if (!h1) return;
+  const m = /سورة\s+(.+?)،\s*الآية\s+(\S+)/.exec(h1.textContent); if (!m) return;
+  const url = location.origin + location.pathname;
+  const toast = msg => { const t = document.createElement('div'); t.textContent = msg; t.setAttribute('role', 'status'); t.style.cssText = 'position:fixed;inset-inline:16px;bottom:24px;margin:auto;max-width:360px;background:#18212e;color:#fff;padding:10px 14px;border-radius:10px;text-align:center;z-index:99;font:inherit;font-size:14px'; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); };
+  const st = document.createElement('style');
+  st.textContent = '.cpyq{display:block;margin-top:6px;font:inherit;font-size:13px;background:none;border:0;padding:0;color:var(--lapis,#1f4f8f);cursor:pointer;text-decoration:underline}';
+  document.head.appendChild(st);
+  document.querySelectorAll('main.sp > section').forEach(sec => {
+    const h2 = sec.querySelector('h2'); if (!h2) return;
+    for (const el of sec.children){
+      if (el.tagName === 'H3') break;
+      if (el.tagName !== 'BLOCKQUOTE') continue;
+      const c = el.cloneNode(true), cite = c.querySelector('cite'), ref = cite ? cite.textContent.trim() : '';
+      if (cite) cite.remove();
+      const q = c.textContent.trim();
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cpyq'; b.textContent = 'انسخ بالإحالة';
+      b.addEventListener('click', () => {
+        const txt = '«' + q + '»\n— ' + h2.textContent.trim() + '، ' + ref + '\nتفسير ' + m[1] + ' ' + m[2] + ' — جامع تفسير الشيخين: ' + url;
+        try { navigator.clipboard.writeText(txt).then(() => toast('نُسخت الجملة مع الإحالة'), () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
+      });
+      el.appendChild(b);
+    }
+  });
+})();

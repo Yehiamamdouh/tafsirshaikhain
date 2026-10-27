@@ -39,6 +39,14 @@
 .tr-fn{margin:0;font-size:14px;line-height:1.7;color:var(--muted,#5b6676);white-space:pre-line}
 .tr-credit{font-size:12px;color:var(--muted,#5b6676)}
 .tr-sum{margin:4px 0 0;font-size:15.5px;line-height:1.8;color:var(--muted,#5b6676);border-inline-start:3px solid var(--line,#d9dee6);padding-inline-start:10px}
+.cpybtn{color:var(--lapis,#1f4f8f);text-decoration:underline}
+.muy{display:grid;gap:6px;background:var(--sheet,#fff);border:1px dashed var(--line,#d9dee6);border-inline-start:4px solid var(--muted,#5b6676);border-radius:10px;padding:12px 14px;margin:4px 0}
+.muy-head{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.muy-head b{font-family:var(--f-display,sans-serif);font-weight:600;font-size:15px}
+.muy-head small{font-size:12.5px;color:var(--muted,#5b6676)}
+.muy-text{margin:0;font-family:var(--f-read,serif);font-size:17px;line-height:1.95;overflow-wrap:anywhere}
+.muy-fn{margin:0;font-size:14px;line-height:1.7;color:var(--muted,#5b6676);white-space:pre-line}
+.muy-credit{font-size:12px;color:var(--muted,#5b6676);overflow-wrap:anywhere}
 .lang-offer{display:flex;gap:8px;align-items:center;justify-content:center;max-width:860px;margin:0 auto 12px;padding:8px 12px;border-radius:10px;background:var(--lapis-soft,#e3ebf6);font-family:system-ui,sans-serif}
 .lo-go{font:inherit;font-size:15px;font-weight:600;background:none;border:0;color:var(--lapis,#1f4f8f);cursor:pointer;text-decoration:underline}
 .lo-x{font:inherit;font-size:20px;line-height:1;background:none;border:0;color:var(--muted,#5b6676);cursor:pointer;padding:0 4px}
@@ -718,7 +726,7 @@ if (dl) dl.addEventListener('click', async () => {
   if (!confirm('سيُحفظ نص المختصرات والنصوص الرئيسية لكل السور (نحو ٧٠ ميجا) لتعمل دون إنترنت. متابعة؟')) return;
   dl.disabled = true;
   const files = ['search.json'];
-  for (let n = 1; n <= 114; n++) files.push('s' + n + '.json');
+  for (let n = 1; n <= 114; n++) files.push('s' + n + '.json', 'tr/muyassar/' + n + '.json');
   let done = 0;
   for (const f of files){
     try { await fetch(f, {cache: 'reload'}); } catch(e){}
@@ -774,6 +782,60 @@ render = function(){
 };
 if (window.I18N) I18N.onChange.push(() => render());
 
+// ===== التفسير الميسر (QuranEnc) for verses with no words of either imam on the site =====
+const MUY = {}; let MUYM = null;
+async function ensureMuy(s){
+  if (!MUY[s]) MUY[s] = await fetch('tr/muyassar/' + s + '.json').then(r => r.ok ? r.json() : []).catch(() => []);
+  if (!MUYM) MUYM = await fetch('tr/muyassar/meta.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+}
+function noImamWords(S, v){
+  return ['IT','IQ'].every(a => !((((S.summ||{})[a]||{})[v]||[]).length) && !((((S.nuq||{})[a]||{})[v]||[]).length));
+}
+const _render3 = render;
+render = function(){
+  _render3();
+  if (state.q || curLang() !== 'ar') return;
+  const s = state.s, v = state.ay, S = cache[s];
+  if (!S || !v || !noImamWords(S, v)) return;
+  if (!MUY[s] || !MUYM){ ensureMuy(s).then(() => { if (state.s === s && state.ay === v) render(); }); return; }
+  const row = MUY[s][v - 1]; if (!row || !row[0]) return;
+  const vt = document.querySelector('.verse-title'); if (!vt) return;
+  const box = document.createElement('div'); box.className = 'muy';
+  box.innerHTML = '<div class="muy-head"><b>التفسير الميسر</b><small>ليس لهذه الآية بعدُ مختصر من كلام الشيخين، فهذا معناها من «التفسير الميسر»، وليس من كلامهما</small></div>';
+  const p = document.createElement('p'); p.className = 'muy-text'; p.textContent = row[0]; box.appendChild(p);
+  if (row[1]){ const f = document.createElement('p'); f.className = 'muy-fn'; f.textContent = row[1]; box.appendChild(f); }
+  const cr = document.createElement('a'); cr.className = 'muy-credit'; cr.href = MUYM.url || 'https://quranenc.com/ar/browse/arabic_moyassar'; cr.target = '_blank'; cr.rel = 'noopener';
+  cr.textContent = (MUYM.credit || 'التفسير الميسر') + ' — الإصدار ' + (MUYM.version || '') + ' · QuranEnc.com';
+  box.appendChild(cr);
+  vt.after(box);
+};
+
+
+
+// ===== «انسخ بالإحالة»: copy one summary sentence with its imam, book/page and the verse link =====
+const _render4 = render;
+render = function(){
+  _render4();
+  if (state.q) return;
+  const s = state.s, v = state.ay, S = cache[s]; if (!S) return;
+  const hasPage = v && ['IT','IQ'].some(a => ((((S.summ||{})[a]||{})[v]||[]).length) || ((((S.nuq||{})[a]||{})[v]||[]).length));
+  const link = hasPage ? location.origin + '/ayah/' + s + '-' + v + '.html' : location.origin + '/tafsir.html#s' + s + 'a' + v;
+  document.querySelectorAll('section.imam').forEach(sec => {
+    const a = sec.classList.contains('IT') ? 'IT' : 'IQ';
+    const pts = ((S.summ||{})[a]||{})[v] || [];
+    sec.querySelectorAll('ul.points > li.pt').forEach((li, i) => {
+      const pt = pts[i]; if (!pt || li.querySelector('.cpybtn')) return;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cite cpybtn'; b.textContent = 'انسخ بالإحالة';
+      b.addEventListener('click', () => {
+        const txt = '«' + pt.t + '»\n— ' + FULL[a] + '، ' + shortRef(S, pt.b, pt.v, pt.p) + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
+        const done = () => toast('نُسخت الجملة مع الإحالة');
+        try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
+      });
+      const body = li.querySelector('.pt-body'); if (body) body.appendChild(b);
+    });
+  });
+};
+
 // start a search from ?q= (home page search box)
 (function(){ const q0 = new URLSearchParams(location.search).get('q'); if (q0){ qEl.value = q0; state.q = q0; state.qshown = 25; setTimeout(() => render(), 300); } })();
 
@@ -786,7 +848,7 @@ if (window.attachVerseFinder) attachVerseFinder(qEl, (s, v) => { state.q = ''; q
 <footer class="site-foot">
   <nav class="langs" aria-label="Languages" style="flex-basis:100%">🌐 <a href="/en/" hreflang="en" lang="en">English</a> · <a href="/ur/" hreflang="ur" lang="ur">اردو</a> · <a href="/id/" hreflang="id" lang="id">Bahasa Indonesia</a> · <a href="/tr/" hreflang="tr" lang="tr">Türkçe</a> · <a href="/fr/" hreflang="fr" lang="fr">Français</a> · <a href="/bn/" hreflang="bn" lang="bn">বাংলা</a> · <a href="/ms/" hreflang="ms" lang="ms">Bahasa Melayu</a> · <a href="/fa/" hreflang="fa" lang="fa">فارسی</a> · <a href="/ru/" hreflang="ru" lang="ru">Русский</a> · <a href="/sw/" hreflang="sw" lang="sw">Kiswahili</a> · <a href="/ha/" hreflang="ha" lang="ha">Hausa</a> · <a href="/es/" hreflang="es" lang="es">Español</a> · <a href="/de/" hreflang="de" lang="de">Deutsch</a> · <a href="/zh/" hreflang="zh" lang="zh">中文</a></nav>
   <p class="disc" style="flex-basis:100%;margin:0;font-size:13px">النصوص منقولة بحروفها من الطبعات المذكورة تحت كل نص؛ يُرجى الرجوع إلى الأصل عند الاستشهاد، ومن وجد خطأً فليتفضل <a href="/about.html#feedback">بإرساله</a>.</p>
-  <span>جامع تفسير الشيخين ·<a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/books.html">المصادر</a> · <a href="/about.html">عن المشروع</a> · <a href="/about.html#feedback">أرسل تصويبًا</a> · <a href="/privacy.html">الخصوصية وشروط الاستخدام</a></span>
+  <span>جامع تفسير الشيخين ·<a href="/">الرئيسية</a> · <a href="/tafsir.html">التفسير</a> · <a href="/books.html">المصادر</a> · <a href="/about.html">عن المشروع</a> · <a href="/updates.html">آخر التحديثات</a> · <a href="/about.html#feedback">أرسل تصويبًا</a> · <a href="/privacy.html">الخصوصية وشروط الاستخدام</a></span>
   <a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a>
 </footer>
 

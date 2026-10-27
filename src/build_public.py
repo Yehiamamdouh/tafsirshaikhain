@@ -16,7 +16,7 @@ Q=json.load(open(T+'/data/simple.json'))
 
 # 1) data
 for f in (glob.glob(DATA+'/*.json') if DATA else []): shutil.copy2(f,P)
-idx=[];st={'ayat':set(),'IT':0,'IQ':0,'nuq':0,'books':set()}
+idx=[];st={'ayat':set(),'IT':0,'IQ':0,'nuq':0,'books':set(),'summN':0}
 SUR={}
 for s in range(1,115):
     d=json.load(open(f'{DATA or P}/s{s}.json')); SUR[s]=d
@@ -24,7 +24,7 @@ for s in range(1,115):
     for a,m in d.get('summ',{}).items():
         for v,l in m.items():
             st['ayat'].add((s,int(v))); st[a]+=1
-            for x in l: idx.append([s,int(v),a,0,x['t']])
+            for x in l: idx.append([s,int(v),a,0,x['t']]); st['summN']+=1
     for a,m in d.get('nuq',{}).items():
         for v,l in m.items():
             for x in l: st['nuq']+=1; idx.append([s,int(v),a,1,x.get('who',''),x['t']])
@@ -66,7 +66,7 @@ write('index.html',page('جامع تفسير الشيخين — تفسير ال�
 # 4) about
 sc=json.load(open(T+'/scale.json'))
 fmt=lambda n: AR(f'{n:,}')
-scale_html=''.join(f'<div class="num"><b>{v}</b><span>{l}</span></div>' for v,l in [(fmt(sc['books']),'كتابًا مصدرًا للإمامين'),(fmt(round(sc['srcPages'],-2))+'+','صفحة مطبوعة فيها'),(AR(round(sc['srcWords']/1e6))+' مليون','كلمة قُرئت'),(fmt(round(sc['passages'],-2))+'+','موضعًا ذكرا فيه آية'),(fmt(sc['versesMentioned']),'آية ورد لهما فيها كلام'),(fmt(stats['ayat']),'آية لها مختصر حتى الآن'),(fmt(sc['summ']),'جملة في المختصرات'),(fmt(stats['nuq']),'نقلًا عن السلف والمفسرين')])
+scale_html=''.join(f'<div class="num"><b>{v}</b><span>{l}</span></div>' for v,l in [(fmt(sc['books']),'كتابًا مصدرًا للإمامين'),(fmt(round(sc['srcPages'],-2))+'+','صفحة مطبوعة فيها'),(AR(round(sc['srcWords']/1e6))+' مليون','كلمة قُرئت'),(fmt(round(sc['passages'],-2))+'+','موضعًا ذكرا فيه آية'),(fmt(sc['versesMentioned']),'آية ورد لهما فيها كلام'),(fmt(stats['ayat']),'آية لها مختصر حتى الآن'),(fmt(st['summN']),'جملة في المختصرات'),(fmt(stats['nuq']),'نقلًا عن السلف والمفسرين')])
 about=style+open(T+'/about.html').read().replace('{{SCALE}}',scale_html).replace('{{TURNSTILE_SITEKEY}}',SITEKEY)
 write('about.html',page('عن المشروع — جامع تفسير الشيخين','الدافع ومنهج العمل والمصادر والقيمة المضافة لجامع تفسير الشيخين، ونموذج إرسال التصويبات.','/about.html',about))
 
@@ -165,6 +165,17 @@ bl=''.join(f'<section><h2>{IMAM[a]}</h2><div class="vrows">'+''.join(f'<a class=
 write('books.html',page('مصادر جامع تفسير الشيخين — كتب ابن تيمية وابن القيم','كتب شيخ الإسلام ابن تيمية والإمام ابن القيم التي جُمع منها تفسيرهما، مع الآيات المنقولة من كل كتاب.','/books.html',
       style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › المصادر</nav><h1>المصادر</h1>'+bl+'</main>'))
 urls.append('/books.html')
+# 6c) updates page (version history + live numbers)
+UPD=json.load(open(T+'/updates.json'))
+AV=lambda v: AR(v).replace('.','٫')
+AD=lambda d: AR(d[8:10].lstrip('0'))+' '+['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'][int(d[5:7])-1]+' '+AR(d[:4])
+nums=''.join(f'<div class="num"><b>{v}</b><span>{l}</span></div>' for v,l in [(fmt(stats['ayat']),'آية لها مختصر من كلام الإمامين'),(fmt(st['summN']),'جملة بنص كلامهما'),(fmt(stats['nuq']),'نقلًا عن السلف والمفسرين'),(fmt(stats['booksIT']+stats['booksIQ']),'كتابًا مصدرًا')])
+ent=''.join(f'<section><h2>الإصدار {AV(u["v"])} — {E(u["title"])}</h2><p class="upd-date">{AD(u["date"])}</p><ul>'+''.join(f'<li>{E(i)}</li>' for i in u['items'])+'</ul></section>' for u in UPD)
+ub=(style+'<style>.upd-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.upd-nums .num{display:grid;gap:2px;background:var(--sheet,#fff);border:1px solid var(--line,#d9dee6);border-radius:10px;padding:10px 12px}.upd-nums b{font-size:20px}.upd-nums span{font-size:13px;color:var(--muted,#5b6676)}.upd-date{margin:0;font-size:13px;color:var(--muted,#5b6676)}</style>'
+    f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › آخر التحديثات</nav><h1>آخر التحديثات</h1>'
+    f'<p>الموقع يُحدَّث باستمرار، وهذه أرقامه الآن (الإصدار {AV(UPD[0]["v"])}، {AD(UPD[0]["date"])}):</p><div class="upd-nums">{nums}</div>'+ent+'</main>')
+write('updates.html',page('آخر التحديثات — جامع تفسير الشيخين','سجل إصدارات جامع تفسير الشيخين وما أضيف في كل إصدار، مع أرقام الموقع الحالية.','/updates.html',ub))
+urls.append('/updates.html')
 nf=page('الصفحة غير موجودة — جامع تفسير الشيخين','الصفحة المطلوبة غير موجودة.','/404.html',
         style+'<main class="sp"><h1>الصفحة غير موجودة</h1><p lang="en" dir="ltr">Page not found.</p><a class="btn pri open" href="/">الرئيسية · Home</a></main>')
 write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<meta name="robots" content="noindex">'))
@@ -180,5 +191,14 @@ for f in ('i18n.js','qsuggest.js','share.js','quran_clean.json','theme.css','sw.
 os.makedirs(P+'/i18n',exist_ok=True); os.makedirs(P+'/st',exist_ok=True)
 for f in glob.glob(T+'/i18n/*.json'): shutil.copy2(f,P+'/i18n')
 for f in glob.glob(T+'/st/*.json'): shutil.copy2(f,P+'/st')
+# 6b) التفسير الميسر (QuranEnc, unmodified) -> public/tr/muyassar/{s}.json, shown only for verses without the imams' words
+MY=json.load(open(T+'/data/arabic_moyassar.json')); ed=MY['edition']
+os.makedirs(P+'/tr/muyassar',exist_ok=True)
+for s in range(1,115):
+    vs=MY['verses'][str(s)]
+    rows=[[vs[str(v)]['text'],vs[str(v)].get('footnotes') or ''] for v in range(1,len(vs)+1)]
+    json.dump(rows,open(f'{P}/tr/muyassar/{s}.json','w'),ensure_ascii=False,separators=(',',':'))
+json.dump({'title':ed['name'],'credit':'التفسير الميسر، مجمع الملك فهد لطباعة المصحف الشريف','version':ed['version'],
+           'url':'https://quranenc.com/ar/browse/arabic_moyassar','transcript':ed.get('transcript','')},open(P+'/tr/muyassar/meta.json','w'),ensure_ascii=False)
 print('built; pages',len(urls),'stats',stats)
 import subprocess; subprocess.run([sys.executable,T+'/build_langs.py',REPO],check=True)
