@@ -40,6 +40,13 @@ def page(title,desc,path,body,jsonld=None):
     return h+body+FOOT+'\n</body>\n</html>\n'
 def write(rel,txt):
     p=os.path.join(P,rel); os.makedirs(os.path.dirname(p),exist_ok=True); open(p,'w').write(txt)
+# sitemap <lastmod>: per-URL hash of the <main> content, kept in src/data/lastmod.json (shared with build_langs.py)
+import hashlib, datetime
+TODAY=datetime.date.today().isoformat()
+LM_F=T+'/data/lastmod.json'; LM=json.load(open(LM_F)) if os.path.exists(LM_F) else {}
+def touch(url,txt):
+    m=re.search(r'<main\b.*</main>',txt,re.S); h=hashlib.sha1((m.group(0) if m else txt).encode()).hexdigest()[:10]
+    if LM.get(url,[None])[0]!=h: LM[url]=[h,TODAY]
 
 # 2) interactive app -> tafsir.html
 body=open(T+'/app.html').read()
@@ -59,9 +66,14 @@ st_html=''.join(f'<div class="stat"><b>{AR(f"{n:,}")}</b><span>{l}</span></div>'
 home=open(T+'/home.html').read().replace('{{SURAS}}',suras).replace('{{STATS}}',st_html)
 site_ld={"@context":"https://schema.org","@type":"WebSite","name":"جامع تفسير الشيخين","url":BASE+"/","inLanguage":"ar",
          "potentialAction":{"@type":"SearchAction","target":BASE+"/tafsir.html?q={q}","query-input":"required name=q"}}
+# the home page is the interactive app; add a plain-link surah index under it so crawlers reach /surah/N.html
+sidx=('<section class="sura-index" aria-labelledby="suras-h" style="width:100%;max-width:1100px;box-sizing:border-box;margin:24px auto 0;padding:0 16px">'
+      '<h2 id="suras-h" style="font-size:20px;margin:0 0 12px">فهرس السور</h2><nav class="suras" aria-label="فهرس السور" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">'+suras+'</nav></section>')
+mline=re.search(r'<main id="main".*?</main>',body,re.S).group(0)
+body_home=body.replace(mline,mline+'\n  '+sidx,1)
 write('index.html',page('جامع تفسير الشيخين — تفسير القرآن بكلام ابن تيمية وابن القيم',
       'جامع تفسير الشيخين: معاني القرآن الكريم بكلام شيخ الإسلام ابن تيمية والإمام ابن القيم، مختصر لكل آية بنص كلامهما مع الإحالة، والنصوص كاملة، وما نقلاه عن السلف، وبحث في المصحف كله.',
-      '/',body,site_ld))
+      '/',body_home,site_ld))
 
 # 4) about
 sc=json.load(open(T+'/scale.json'))
@@ -98,6 +110,11 @@ AUTH={'IT':{"@type":"Person","name":"أحمد بن عبد الحليم ابن ت
       'IQ':{"@type":"Person","name":"محمد بن أبي بكر ابن قيم الجوزية","alternateName":"ابن القيم"}}
 # verse pages are regenerated from scratch so a verse whose summaries moved away doesn't keep a stale page
 shutil.rmtree(P+'/ayah',ignore_errors=True)
+# well-known names people search by (used in the verse page title/h1)
+FAMOUS={(2,255):'آية الكرسي',(2,285):'خواتيم سورة البقرة',(2,286):'خواتيم سورة البقرة',(24,35):'آية النور',(2,282):'آية الدين',
+        (5,6):'آية الوضوء',(3,61):'آية المباهلة',(33,33):'آية التطهير',(5,3):'آية إكمال الدين',(7,172):'آية الميثاق',
+        (33,53):'آية الحجاب',(9,5):'آية السيف',(2,183):'آية الصيام',(4,11):'آية المواريث',(4,12):'آية المواريث',
+        (4,176):'آية الكلالة',(16,90):'آية العدل والإحسان',(17,23):'آية بر الوالدين',(2,256):'آية لا إكراه في الدين',(39,53):'آية الرجاء'}
 urls=['/','/about.html','/privacy.html']
 pages={(s,v) for s in range(1,115) for k in ('summ','nuq') for a in ('IT','IQ') for v in map(int,SUR[s].get(k,{}).get(a,{})) if v>=1}
 BOOKS={}   # slug -> {'b':book,'v':set((s,v))}
@@ -128,12 +145,13 @@ for s in range(1,115):
             relh='<section><h3>آيات ذكرها في كلامه هنا</h3><div class="rel">'+''.join(
                 (f'<a href="/ayah/{c}-{w}.html">' if (c,w) in pages else '<span>')+f'{E(NAMES[c-1])} {AR(w)}'+('</a>' if (c,w) in pages else '</span>') for c,w in rel[:24])+'</div></section>'
         vt=verses[v-1]; short=' '.join(vt.split()[:7])+('…' if len(vt.split())>7 else '')
-        title=f'تفسير {short} [{name}: {v}] — ابن تيمية وابن القيم'
+        fam=FAMOUS.get((s,v))
+        title=f'تفسير {fam} [{name}: {v}] — ابن تيمية وابن القيم' if fam else f'تفسير {short} [{name}: {v}] — ابن تيمية وابن القيم'
         desc=((('قال ابن تيمية: ' if firsta=='IT' else 'قال ابن القيم: ')+first) if first else f'تفسير قوله تعالى ﴿{vt}﴾ بكلام ابن تيمية وابن القيم')[:155]
         i=have.index(v); prv=have[i-1] if i>0 else None; nxt=have[i+1] if i+1<len(have) else None
         nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+relh+
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+relh+
               f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (النصوص كاملة)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
@@ -180,6 +198,10 @@ nf=page('الصفحة غير موجودة — جامع تفسير الشيخين
         style+'<main class="sp"><h1>الصفحة غير موجودة</h1><p lang="en" dir="ltr">Page not found.</p><a class="btn pri open" href="/">الرئيسية · Home</a></main>')
 write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<meta name="robots" content="noindex">'))
 shutil.copy2(T+'/og.png',P)
+for u in urls:
+    f=P+(u+'index.html' if u.endswith('/') else u)
+    if os.path.exists(f): touch(u,open(f).read())
+open(LM_F,'w').write('{\n'+',\n'.join(json.dumps(k,ensure_ascii=False)+':'+json.dumps(LM[k]) for k in sorted(LM))+'\n}\n')  # one URL per line keeps git diffs small
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in urls)+'</urlset>\n'
 open(P+'/sitemap.xml','w').write(sm)
 open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {BASE}/sitemap.xml\n')

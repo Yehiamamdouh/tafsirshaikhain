@@ -53,7 +53,14 @@ for _l in L:
     if os.path.exists(f'{P}/{_l}/index.html'): os.remove(f'{P}/{_l}/index.html')
 shutil.rmtree(P+'/lp',ignore_errors=True)
 packs={}
+import hashlib, datetime
+TODAY=datetime.date.today().isoformat()
+LM_F=T+'/data/lastmod.json'; LM=json.load(open(LM_F)) if os.path.exists(LM_F) else {}
+def touch(url,txt):
+    m=re.search(r'<main\b.*</main>',txt,re.S); h=hashlib.sha1((m.group(0) if m else txt).encode()).hexdigest()[:10]
+    if LM.get(url,[None])[0]!=h: LM[url]=[h,TODAY]
 def out(l,tail,s,v,h):
+    touch(f'/{l}/{tail}',h)
     if l in DYN:
         packs.setdefault((l,f'{s}_{v//50}' if s else 'home'),{})[tail]=h
     else:
@@ -146,10 +153,10 @@ for root,_,files in os.walk(P):
     for f in files:
         p=os.path.join(root,f); tail=f'{rel}/{f}'.replace(os.sep,'/'); h=open(p).read()
         if 'rel="alternate" hreflang' not in h: open(p,'w').write(h.replace('</head>',alts(tail)+'</head>',1))
-import datetime
-today=datetime.date.today().isoformat()
+today=TODAY
+open(LM_F,'w').write('{\n'+',\n'.join(json.dumps(k,ensure_ascii=False)+':'+json.dumps(LM[k]) for k in sorted(LM))+'\n}\n')  # one URL per line keeps git diffs small
 def smap(name,us):
-    open(f'{P}/{name}','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in us)+'</urlset>\n')
+    open(f'{P}/{name}','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc>'+(f'<lastmod>{LM[u][1]}</lastmod>' if u in LM else '')+'</url>\n' for u in us)+'</urlset>\n')
 ar_urls=re.findall(r'<loc>'+re.escape(BASE)+r'(.*?)</loc>',open(P+'/sitemap.xml').read())
 smap('sitemap-ar.xml',ar_urls)
 for l in L: smap(f'sitemap-{l}.xml',[u for u in urls if u.startswith(f'/{l}/')])
