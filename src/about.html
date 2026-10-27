@@ -91,11 +91,6 @@
     </ul>
   </section>
 
-  <section>
-    <h2>الأرقام</h2>
-    <div class="nums" id="nums"><div class="num"><b>…</b><span>جارٍ التحميل</span></div></div>
-    <p class="lede" style="font-size:14px;margin-top:8px">العمل مستمر، وتتحدث الأرقام مع كل إضافة.</p>
-  </section>
 
   <section id="feedback">
     <h2>ملاحظات وتصويبات</h2>
@@ -122,10 +117,6 @@
 <script>
 (function(){
   const AR = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-  fetch('/stats.json').then(r => r.json()).then(s => {
-    const items = [[s.ayat,'آية لها مختصر'],[s.IT,'مختصر لابن تيمية'],[s.IQ,'مختصر لابن القيم'],[s.nuq,'نقلًا عن السلف والمفسرين'],[s.booksIT + s.booksIQ,'كتابًا مصدرًا']];
-    document.getElementById('nums').innerHTML = items.map(([n,l]) => '<div class="num"><b>' + AR(n.toLocaleString('en')) + '</b><span>' + l + '</span></div>').join('');
-  }).catch(() => {});
   document.getElementById('t0').value = Date.now();
   const f = document.getElementById('fb'), msg = document.getElementById('fbmsg');
   f.addEventListener('submit', async e => {
