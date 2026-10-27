@@ -188,6 +188,10 @@ open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nDisallow: /api/\nSite
 for f in ('worker.js','wrangler.jsonc'): shutil.copy2(T+'/'+f,REPO)
 for f in ('i18n.js','qsuggest.js','share.js','quran_clean.json','theme.css','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','_headers'):
     if os.path.exists(T+'/'+f): shutil.copy2(T+'/'+f,P)
+# service-worker cache version = fingerprint of the data, so every content release replaces old cached surah data
+import hashlib
+_fp=hashlib.sha1(''.join(f'{os.path.basename(x)}:{os.path.getsize(x)};' for x in sorted(glob.glob(P+'/*.json'))).encode()+open(P+'/stats.json','rb').read()).hexdigest()[:10]
+_sw=open(P+'/sw.js').read().replace("'shaykhain-v2'",f"'shaykhain-{_fp}'"); open(P+'/sw.js','w').write(_sw)
 os.makedirs(P+'/i18n',exist_ok=True); os.makedirs(P+'/st',exist_ok=True)
 for f in glob.glob(T+'/i18n/*.json'): shutil.copy2(f,P+'/i18n')
 for f in glob.glob(T+'/st/*.json'): shutil.copy2(f,P+'/st')

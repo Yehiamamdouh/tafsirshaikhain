@@ -7,10 +7,10 @@ self.addEventListener('activate', e => e.waitUntil(
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin || u.pathname.startsWith('/api/')) return;
-  const isPage = e.request.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(u.pathname) || u.pathname === '/';
+  const isPage = e.request.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(u.pathname) || u.pathname === '/' || /^\/(stats|updates)\.json$/.test(u.pathname);
   e.respondWith(caches.open(C).then(async c => {
     if (isPage){
-      try { const r = await fetch(e.request); if (r.ok) c.put(e.request, r.clone()); return r; }
+      try { const r = await (/\.json$/.test(u.pathname) ? fetch(u.pathname, {cache: 'no-cache'}) : fetch(e.request)); if (r.ok) c.put(e.request, r.clone()); return r; }
       catch(err){ return (await c.match(e.request, {ignoreSearch: true})) || Response.error(); }
     }
     const hit = await c.match(e.request, {ignoreSearch: true});
