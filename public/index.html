@@ -153,6 +153,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{ou
 .quote{font-family:var(--f-read);font-size:18px;line-height:2;margin:0;max-width:65ch;overflow-wrap:anywhere}
 .cite{font:inherit;font-size:12.5px;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;justify-self:start;text-align:start}
 .cite:hover{color:var(--ink);text-decoration:underline}
+.pcx{font-size:12.5px;color:var(--muted);margin:0;font-style:italic}
 .pt .full{font-family:var(--f-read);font-size:16px;line-height:1.95;color:var(--muted);margin:4px 0 0;max-width:65ch;border-inline-start:2px solid var(--line);padding-inline-start:10px;overflow-wrap:anywhere}
 .none{padding:6px 16px 14px;color:var(--muted);margin:0;max-width:62ch}
 .drawer-btn{font:inherit;font-weight:600;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;
@@ -202,7 +203,8 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 <style>
 /* additions for multi-surah navigation */
 .surah-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.surah-pick select{font:inherit;font-family:var(--f-display);font-size:18px;padding:7px 14px;border-radius:12px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);min-width:min(260px,100%);flex:1 1 220px;max-width:340px}
+.pick-lbl{font-family:var(--f-ui);font-size:14px;font-weight:600;color:var(--ink)}
+.surah-pick select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%231f4d3a' stroke-width='2.2'/%3E%3C/svg%3E");background-position:14px 50%;background-size:14px 9px;background-repeat:no-repeat;padding-left:34px!important;border-width:1.5px!important;border-color:var(--lapis)!important;font:inherit;font-family:var(--f-display);font-size:18px;padding:7px 14px;border-radius:12px;border:1px solid var(--line);background-color:var(--sheet);color:var(--ink);min-width:min(260px,100%);flex:1 1 220px;max-width:340px}
 .surah-pick button{font:inherit;font-family:var(--f-ui);font-size:14px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
 .surah-pick button:disabled{opacity:.4;cursor:default}
 .surah-tabs{display:flex;gap:8px;flex-wrap:wrap}
@@ -257,9 +259,8 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
     </article>
   </section></details>
     <div class="surah-pick">
-      <button type="button" id="sprev">→ السابقة</button>
-      <select id="ssel" aria-label="اختر السورة"></select>
-      <button type="button" id="snext">التالية ←</button>
+      <label for="ssel" class="pick-lbl">اختر السورة</label>
+      <select id="ssel"></select>
     </div>
   </header>
 
@@ -364,7 +365,7 @@ async function go(s, v, scroll){
   if (state.s !== s){ state.s = s; state.inc = {IT:false,IQ:false}; }
   state.ay = v; resetVerseState();
   if (state.q){ state.q=''; qEl.value=''; }
-  ssel.value = String(s); sprev.disabled = s === 1; snext.disabled = s === 114;
+  ssel.value = String(s);
   document.getElementById('sname').textContent = 'سورة ' + SURAHS[s].name;
   qEl.placeholder = 'ابحث في نصوص سورة ' + SURAHS[s].name + '…' + (EXAMPLES[s] ? ' مثال: ' + EXAMPLES[s] : '');
   try { history.replaceState(null, '', '#s' + s + 'a' + v); } catch(e){}
@@ -410,12 +411,10 @@ function buildIndex(S){
   box.insertAdjacentHTML('beforeend', '<div class="grid-legend"><span><i></i>لها مختصر أو نقول</span><span>الأرقام الداكنة: لها نصوص للمذاكرة</span></div>');
 }
 
-const ssel = document.getElementById('ssel'), sprev = document.getElementById('sprev'), snext = document.getElementById('snext');
+const ssel = document.getElementById('ssel');
 NAMES.forEach((name, k) => { const o = document.createElement('option'); o.value = String(k + 1); o.textContent = AR(k + 1) + ' · ' + name; ssel.appendChild(o); });
 const goSurah = s => go(s, s === 1 ? 0 : 1, false);
 ssel.addEventListener('change', () => goSurah(+ssel.value));
-sprev.addEventListener('click', () => { if (state.s > 1) goSurah(state.s - 1); });
-snext.addEventListener('click', () => { if (state.s < 114) goSurah(state.s + 1); });
 document.querySelectorAll('[data-a]').forEach(btn => btn.addEventListener('click', () => {
   state.a = btn.dataset.a;
   document.querySelectorAll('[data-a]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
@@ -482,7 +481,7 @@ function imamBlock(S, a, v){
 function pointEl(S, pt){
   const li = document.createElement('li'); li.className = 'pt';
   const label = () => shortRef(S, pt.b, pt.v, pt.p);
-  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p><button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
+  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p>' + (pt.cx ? '<p class="pcx">' + esc(pt.cx) + '</p>' : '') + '<button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
   const btn = li.querySelector('.cite');
   btn.addEventListener('click', () => {
     let full = li.querySelector('.full');
