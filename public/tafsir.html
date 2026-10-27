@@ -841,6 +841,18 @@ render = function(){
 // verse finder on the tafsir search box
 if (window.attachVerseFinder) attachVerseFinder(qEl, (s, v) => { state.q = ''; qEl.value = ''; go(s, v, true); });
 
+// home surah index: plain links to /surah/N.html for crawlers; a click opens that surah's verse grid in the app (every verse, incl. ones with only al-Muyassar)
+document.querySelectorAll('.sura-index a.sura').forEach(a => a.addEventListener('click', e => {
+  const m = /\/surah\/(\d+)\.html$/.exec(a.getAttribute('href') || '');
+  if (!m || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  e.preventDefault();
+  goSurah(+m[1]).then(() => {
+    const g = document.querySelector('section.surah'); if (!g) return;
+    const top = [...document.querySelectorAll('header, .controls, .search')].filter(x => /sticky|fixed/.test(getComputedStyle(x).position)).reduce((h, x) => Math.max(h, x.getBoundingClientRect().bottom), 0);
+    window.scrollTo({top: g.getBoundingClientRect().top + scrollY - top - 8});
+  });
+}));
+
 })();
 </script>
 <link rel="stylesheet" href="/theme.css">
