@@ -70,6 +70,7 @@ section.imam,.surah,.controls,.drawer,.ab section{border-color:var(--line)!impor
 .sp section{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;display:grid;gap:10px}
 .sp h2{margin:0;font-size:22px;color:var(--lapis)}
 .sp h3{margin:6px 0 0;font-size:17px;color:var(--gold)}
+.sp blockquote .pcx{display:block;font-family:inherit;font-size:13px;line-height:1.6;color:var(--muted);font-style:italic;margin-top:2px}
 .sp blockquote{margin:0;font-family:var(--f-read);font-size:18.5px;line-height:2.05;border-inline-start:3px solid var(--gold-soft);padding-inline-start:12px}
 .sp cite{display:block;font-style:normal;font-size:13.5px;color:var(--muted);margin-top:2px}
 .sp .who{font-weight:700} .sp .st{font-size:12px;padding:0 8px;border-radius:99px;background:var(--lapis-soft);color:var(--lapis)}

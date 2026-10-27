@@ -114,7 +114,7 @@ for s in range(1,115):
             for x in pts:
                 if not first: first,firsta=x['t'],a
                 rel+=cited(x['t'])
-                sec+=f'<blockquote>{E(x["t"])}<cite>{ref(d,x)}</cite></blockquote>'
+                sec+=f'<blockquote>{E(x["t"])}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
             if nq:
                 sec+='<h3>ما نقله عن غيره</h3>'
                 for x in nq:
