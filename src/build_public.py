@@ -110,13 +110,13 @@ AUTH={'IT':{"@type":"Person","name":"أحمد بن عبد الحليم ابن ت
       'IQ':{"@type":"Person","name":"محمد بن أبي بكر ابن قيم الجوزية","alternateName":"ابن القيم"}}
 # verse pages are regenerated from scratch so a verse whose summaries moved away doesn't keep a stale page
 shutil.rmtree(P+'/ayah',ignore_errors=True)
-# التفسير الميسر (QuranEnc, unmodified): the overall meaning on every static verse page, before the imams' words
+# التفسير الميسر (QuranEnc, unmodified): the overall meaning on every static verse page, after the imams' words
 MYD=json.load(open(T+'/data/arabic_moyassar.json'))
 def muy_html(s,v):
     r=MYD['verses'][str(s)].get(str(v)) or {}
     if not r.get('text'): return ''
     fn=f'<p class="muy-fn">{E(r["footnotes"])}</p>' if r.get('footnotes') else ''
-    return ('<div class="muy"><div class="muy-head"><b>التفسير الميسر</b><small>المعنى الإجمالي للآية، تمهيدًا لكلام الشيخين، وليس من كلامهما</small></div>'
+    return ('<div class="muy"><div class="muy-head"><b>التفسير الميسر</b><small>المعنى الإجمالي للآية من «التفسير الميسر»، وليس من كلام الشيخين</small></div>'
             f'<p class="muy-text">{E(r["text"])}</p>{fn}<a class="muy-credit" href="https://quranenc.com/ar/browse/arabic_moyassar" target="_blank" rel="noopener">'
             f'التفسير الميسر، مجمع الملك فهد لطباعة المصحف الشريف — الإصدار {E(MYD["edition"]["version"])} · QuranEnc.com</a></div>')
 # well-known names people search by (used in the verse page title/h1)
@@ -160,7 +160,7 @@ for s in range(1,115):
         i=have.index(v); prv=have[i-1] if i>0 else None; nxt=have[i+1] if i+1<len(have) else None
         nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+muy_html(s,v)+''.join(parts)+relh+
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+muy_html(s,v)+relh+
               f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (النصوص كاملة)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
