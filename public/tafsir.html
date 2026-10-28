@@ -812,7 +812,7 @@ render = function(){
 
 
 
-// ===== «انسخ بالإحالة»: copy one summary sentence with its imam, book/page and the verse link =====
+// ===== «انسخ بالإحالة» / «انسخ الفقرة كاملة»: copy one summary sentence, or its whole source paragraph, with imam, book/page and the verse link =====
 const _render4 = render;
 render = function(){
   _render4();
@@ -831,7 +831,16 @@ render = function(){
         const done = () => toast('نُسخت الجملة مع الإحالة');
         try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
       });
-      const body = li.querySelector('.pt-body'); if (body) body.appendChild(b);
+      // the whole paragraph the summary sentence was taken from, with its full page range
+      const fb = document.createElement('button'); fb.type = 'button'; fb.className = 'cite cpybtn'; fb.textContent = 'انسخ الفقرة كاملة';
+      fb.addEventListener('click', () => {
+        const r = S.byId.get(pt.r);
+        const ref = r ? '«' + S.books[r.b].t + '» ' + refOf(r) : shortRef(S, pt.b, pt.v, pt.p);
+        const txt = '«' + (r ? r.t : (pt.ft || pt.t)) + '»\n— ' + FULL[a] + '، ' + ref + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
+        const done = () => toast('نُسخت الفقرة كاملة مع الإحالة');
+        try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
+      });
+      const body = li.querySelector('.pt-body'); if (body) body.append(b, fb);
     });
   });
 };
