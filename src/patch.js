@@ -167,7 +167,7 @@ render = function(){
 };
 if (window.I18N) I18N.onChange.push(() => render());
 
-// ===== التفسير الميسر (QuranEnc) for verses with no words of either imam on the site =====
+// ===== التفسير الميسر (QuranEnc): the overall meaning shown with every verse, before the imams' words =====
 const MUY = {}; let MUYM = null;
 async function ensureMuy(s){
   if (!MUY[s]) MUY[s] = await fetch('tr/muyassar/' + s + '.json').then(r => r.ok ? r.json() : []).catch(() => []);
@@ -181,12 +181,12 @@ render = function(){
   _render3();
   if (state.q || curLang() !== 'ar') return;
   const s = state.s, v = state.ay, S = cache[s];
-  if (!S || !v || !noImamWords(S, v)) return;
+  if (!S || !v) return;
   if (!MUY[s] || !MUYM){ ensureMuy(s).then(() => { if (state.s === s && state.ay === v) render(); }); return; }
   const row = MUY[s][v - 1]; if (!row || !row[0]) return;
   const vt = document.querySelector('.verse-title'); if (!vt) return;
   const box = document.createElement('div'); box.className = 'muy';
-  box.innerHTML = '<div class="muy-head"><b>التفسير الميسر</b><small>ليس لهذه الآية بعدُ مختصر من كلام الشيخين، فهذا معناها من «التفسير الميسر»، وليس من كلامهما</small></div>';
+  box.innerHTML = '<div class="muy-head"><b>التفسير الميسر</b><small>' + (noImamWords(S, v) ? 'ليس لهذه الآية بعدُ مختصر من كلام الشيخين، فهذا معناها من «التفسير الميسر»، وليس من كلامهما' : 'المعنى الإجمالي للآية، تمهيدًا لكلام الشيخين، وليس من كلامهما') + '</small></div>';
   const p = document.createElement('p'); p.className = 'muy-text'; p.textContent = row[0]; box.appendChild(p);
   if (row[1]){ const f = document.createElement('p'); f.className = 'muy-fn'; f.textContent = row[1]; box.appendChild(f); }
   const cr = document.createElement('a'); cr.className = 'muy-credit'; cr.href = MUYM.url || 'https://quranenc.com/ar/browse/arabic_moyassar'; cr.target = '_blank'; cr.rel = 'noopener';
