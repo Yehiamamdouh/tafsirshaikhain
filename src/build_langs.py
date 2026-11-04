@@ -136,12 +136,20 @@ def page(l,title,desc,path_tail,body):
             '<link rel="icon" href="/icon.svg" type="image/svg+xml">\n<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap">\n'
             '<link rel="stylesheet" href="/theme.css">\n<style>body{font-family:system-ui,"Segoe UI",sans-serif;color:var(--ink);padding:20px 16px 48px;line-height:1.6}'
-            '.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}.langs{max-width:1100px;margin:24px auto 0;font-size:14px;line-height:2;color:var(--muted)}.langs a{color:var(--lapis)}</style>\n'+GA+'</head>\n<body>\n'
+            '.muy{display:grid;gap:6px;background:var(--sheet,#fff);border:1px dashed var(--line,#d9dee6);border-inline-start:4px solid var(--muted,#5b6676);border-radius:10px;padding:12px 14px;margin:4px 0}.muy-head{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.muy-head b{font-family:var(--f-display,sans-serif);font-weight:600;font-size:15px}.muy-head small{font-size:12.5px;color:var(--muted,#5b6676)}.muy-text{margin:0;font-family:var(--f-read,serif);font-size:17px;line-height:1.95;overflow-wrap:anywhere}.muy-fn{margin:0;font-size:14px;line-height:1.7;color:var(--muted,#5b6676);white-space:pre-line}.muy-credit{font-size:12px;color:var(--muted,#5b6676);overflow-wrap:anywhere}.tr{font-size:17px;line-height:1.8;margin:0}.cr{font-size:12px;color:var(--muted)}.ar{direction:rtl;text-align:right}.langs{max-width:1100px;margin:24px auto 0;font-size:14px;line-height:2;color:var(--muted)}.langs a{color:var(--lapis)}</style>\n'+GA+'</head>\n<body>\n'
             +body+switcher(l,path_tail)+f'<footer class="site-foot"><span>{E(t["site"])} · <a href="/{l}/">{E(t["home"])}</a> · <a href="/about.html">{E(t["about"])}</a> · <a href="/privacy.html">{E(t["privacy"])}</a></span>'
             '<a href="https://doersadv.com" rel="noopener" dir="ltr">Developed by Doers</a></footer>\n'
             f'<script>try{{localStorage.setItem("lang","{l}")}}catch(e){{}}document.addEventListener("click",function(e){{var a=e.target.closest&&e.target.closest("[data-l]");if(a)try{{localStorage.setItem("lang",a.dataset.l)}}catch(x){{}}}})</script>\n</body>\n</html>\n')
 def ref(d,x):
     b=d['books'][x['b']]; return '«'+b['t']+'» '+(str(x['v'])+'/' if x.get('v') else '')+str(x['p'])
+# al-Mukhtasar fi Tafsir al-Qur'an (QuranEnc translations): the overall meaning after the imams' words, like al-Muyassar on the Arabic pages
+MXM={k:v['mx'] for k,v in META.items() if v.get('mx')}
+def mx_html(l,rows,v):
+    if not rows or v-1>=len(rows) or not rows[v-1][0]: return ''
+    m=MXM[l]; t,fn=rows[v-1]
+    return (f'<div class="muy"><div class="muy-head"><b>{E(m["head"])}</b><small>{E(m["note"])}</small></div><p class="muy-text">{E(t)}</p>'
+            +(f'<p class="muy-fn">{E(fn)}</p>' if fn else '')
+            +f'<a class="muy-credit" href="{E(m["url"])}" target="_blank" rel="noopener" dir="ltr">{E(m["title"])} — {E(m["date"])} · QuranEnc.com</a></div>')
 urls=[]; n=0
 for l,t in L.items():
     m=META[l]; cred=f'{m["title"]} — v{m["version"]} · QuranEnc.com'
@@ -149,6 +157,7 @@ for l,t in L.items():
     sur_links=[]
     for s in range(1,115):
         d=SUR[s]; tr=json.load(open(f'{P}/tr/{l}/{s}.json')); sn=name(l,s)
+        MXS=json.load(open(f'{P}/tr/mx/{l}/{s}.json')) if MXM.get(l) else None  # al-Mukhtasar (QuranEnc), unmodified
         have=sorted({int(v) for k in ('summ','nuq') for a in ('IT','IQ') for v in d.get(k,{}).get(a,{})}); have=[v for v in have if v>=1]
         for i,v in enumerate(have):
             parts=''
@@ -165,7 +174,7 @@ for l,t in L.items():
             body=(f'<main class="sp"><nav class="crumbs"><a href="/{l}/">{E(t["home"])}</a> › <a href="/{l}/surah/{s}.html">{E(t["surah"])} {E(sn)}</a> › {E(t["verse"])} {v}</nav>'
                   f'<h1>{E(t["tafsir"])} {E(t["surah"])} {E(sn)} {s}:{v}</h1><p class="vt ar" lang="ar">﴿{E(QA[str(s)][v-1]["text"])}﴾</p>'
                   f'<section><h3>{E(t["meaning"])}</h3><p class="tr"'+(f' dir="{TDIR[l]}"' if l in TDIR else '')+f'>{E(vtr)}</p><span class="cr" dir="ltr">{E(cred)}</span></section>'
-                  f'<p class="cr">{E(t["note"])}</p>'+parts+f'<a class="btn pri open" href="/tafsir.html?lang={l}#s{s}a{v}">{E(t["open"])}</a>'+nav+'</main>')
+                  f'<p class="cr">{E(t["note"])}</p>'+parts+mx_html(l,MXS,v)+f'<a class="btn pri open" href="/tafsir.html?lang={l}#s{s}a{v}">{E(t["open"])}</a>'+nav+'</main>')
             out(l,f'ayah/{s}-{v}.html',s,v,page(l,title,vtr[:155] or title,f'ayah/{s}-{v}.html',body)); urls.append(f'/{l}/ayah/{s}-{v}.html'); n+=1
         vl=''.join(f'<a href="/{l}/ayah/{s}-{v}.html">{v}</a>' for v in have)
         body=(f'<main class="sp"><nav class="crumbs"><a href="/{l}/">{E(t["home"])}</a> › {E(t["surah"])} {E(sn)}</nav><h1>{E(t["tafsir"])} {E(t["surah"])} {E(sn)} — {E(t["by"])}</h1>'

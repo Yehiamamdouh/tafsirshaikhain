@@ -913,6 +913,33 @@ document.querySelectorAll('.sura-index a.sura').forEach(a => a.addEventListener(
   });
 }));
 
+// ===== al-Mukhtasar fi Tafsir al-Qur'an (QuranEnc translation): the overall meaning in the reader's language, after the imams' words (alone when the verse has none) =====
+const MX = {};
+const _render5 = render;
+render = function(){
+  _render5();
+  const l = curLang(); if (l === 'ar' || state.q) return;
+  const m = ((I18N.meta || {})[l] || {}).mx; if (!m) return;
+  const s = state.s, v = state.ay, S = cache[s];
+  if (!S || !v) return;
+  const k = l + s;
+  if (!MX[k]){ MX[k] = fetch('tr/mx/' + l + '/' + s + '.json').then(r => r.ok ? r.json() : []).catch(() => []); MX[k].then(rows => { MX[k] = rows; if (state.s === s && state.ay === v && curLang() === l) render(); }); return; }
+  if (MX[k] instanceof Promise) return;
+  const row = MX[k][v - 1]; if (!row || !row[0]) return;
+  const none = noImamWords(S, v);
+  const box = document.createElement('div'); box.className = 'muy'; box.setAttribute('lang', l); box.setAttribute('dir', (I18N.meta[l] || {}).dir || 'ltr');
+  const h = document.createElement('div'); h.className = 'muy-head';
+  const b = document.createElement('b'); b.textContent = m.head; const sm = document.createElement('small'); sm.textContent = none ? m.note0 : m.note;
+  h.append(b, sm); box.appendChild(h);
+  const p = document.createElement('p'); p.className = 'muy-text'; p.textContent = row[0]; box.appendChild(p);
+  if (row[1]){ const f = document.createElement('p'); f.className = 'muy-fn'; f.textContent = row[1]; box.appendChild(f); }
+  const cr = document.createElement('a'); cr.className = 'muy-credit'; cr.href = m.url; cr.target = '_blank'; cr.rel = 'noopener'; cr.dir = 'ltr';
+  cr.textContent = m.title + ' — ' + m.date + ' · QuranEnc.com'; box.appendChild(cr);
+  const imams = document.querySelectorAll('#main section.imam');
+  const anchor = (none || !imams.length) ? (document.querySelector('#main .tr-verse') || document.querySelector('#main .verse-title')) : imams[imams.length - 1];
+  if (anchor) anchor.after(box);
+};
+
 })();
 </script>
 <link rel="stylesheet" href="/theme.css">
