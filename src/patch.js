@@ -131,7 +131,7 @@ async function ensureTr(l, s){
   if (!TRS[l]) TRS[l] = await fetch('st/' + l + '.json').then(r => r.ok ? r.json() : {}).catch(() => ({}));
 }
 function trBlock(text, cls, l){
-  const p = document.createElement('p'); p.className = cls; p.setAttribute('dir', (I18N.meta && I18N.meta[l] && I18N.meta[l].dir) || 'auto'); p.setAttribute('lang', l);
+  const p = document.createElement('p'); p.className = cls; p.setAttribute('dir', (I18N.meta && I18N.meta[l] && (I18N.meta[l].tdir || I18N.meta[l].dir)) || 'auto'); p.setAttribute('lang', l);
   p.textContent = text; return p;
 }
 const _render2 = render;
