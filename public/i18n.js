@@ -37,6 +37,7 @@
     const dir = (meta[l] && meta[l].dir) || 'ltr';
     document.querySelectorAll('main.ab, header.top h1, header.top .lede, details.intro, .about-link, .site-foot, .crumbs, .gres-h').forEach(e => { e.setAttribute('dir', dir); e.setAttribute('lang', l); });
     document.documentElement.setAttribute('lang', l);
+    document.documentElement.setAttribute('data-ldir', dir);
     sweep(); observe();
     I.onChange.forEach(f => { try { f(l); } catch(e){} });
   }
