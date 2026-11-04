@@ -62,7 +62,7 @@
     if (host.matches('header.top')) host.prepend(sel); else host.appendChild(sel);
   }
   // visitors whose browser language is supported get a one-tap offer (no forced redirect: keeps Arabic URLs crawlable)
-  const OFFER = {hi:"यह साइट हिन्दी में पढ़ें",ps:"دا وېبپاڼه په پښتو ولولئ",so:"Ku akhri boggan Af-Soomaali",uz:"Бу сайтни ўзбек тилида ўқинг",ku:"ئەم ماڵپەڕە بە کوردی بخوێنەوە",az:"Bu saytı Azərbaycan dilində oxuyun",bs:"Čitajte ovu stranicu na bosanskom",sq:"Lexojeni këtë faqe në shqip",ta:"இந்தத் தளத்தைத் தமிழில் படிக்கவும்",ml:"ഈ സൈറ്റ് മലയാളത്തിൽ വായിക്കുക",am:"ይህን ድረ ገጽ በአማርኛ ያንብቡ",pt:"Ler este site em português",en:'Read this site in English',fr:'Lire ce site en français',es:'Leer este sitio en español',de:'Diese Seite auf Deutsch lesen',
+  const OFFER = {ff:"Tar lowre ndee e Pulaar",om:"Marsariitii kana Afaan Oromootiin dubbisi",yo:"Ka ojúlé yìí ní èdè Yorùbá",ug:"بۇ تور بېكەتنى ئۇيغۇرچە ئوقۇڭ",as:"এই ছাইটটো অসমীয়াত পঢ়ক",te:"ఈ సైట్‌ను తెలుగులో చదవండి",tg:"Ин сомонаро бо забони тоҷикӣ хонед",kn:"ಈ ತಾಣವನ್ನು ಕನ್ನಡದಲ್ಲಿ ಓದಿ",ky:"Бул сайтты кыргызча окуңуз",gu:"આ સાઇટ ગુજરાતીમાં વાંચો",th:"อ่านเว็บไซต์นี้เป็นภาษาไทย",tl:"Basahin ang site na ito sa Filipino",km:"អានគេហទំព័រនេះជាភាសាខ្មែរ",si:"මෙම වෙබ් අඩවිය සිංහලෙන් කියවන්න",nl:"Lees deze site in het Nederlands",sv:"Läs denna webbplats på svenska",hi:"यह साइट हिन्दी में पढ़ें",ps:"دا وېبپاڼه په پښتو ولولئ",so:"Ku akhri boggan Af-Soomaali",uz:"Бу сайтни ўзбек тилида ўқинг",ku:"ئەم ماڵپەڕە بە کوردی بخوێنەوە",az:"Bu saytı Azərbaycan dilində oxuyun",bs:"Čitajte ovu stranicu na bosanskom",sq:"Lexojeni këtë faqe në shqip",ta:"இந்தத் தளத்தைத் தமிழில் படிக்கவும்",ml:"ഈ സൈറ്റ് മലയാളത്തിൽ വായിക്കുക",am:"ይህን ድረ ገጽ በአማርኛ ያንብቡ",pt:"Ler este site em português",en:'Read this site in English',fr:'Lire ce site en français',es:'Leer este sitio en español',de:'Diese Seite auf Deutsch lesen',
     tr:'Bu siteyi Türkçe okuyun',id:'Baca situs ini dalam Bahasa Indonesia',ms:'Baca laman ini dalam Bahasa Melayu',ru:'Читать сайт на русском',
     ur:'یہ سائٹ اردو میں پڑھیں',fa:'این سایت را به فارسی بخوانید',bn:'এই সাইটটি বাংলায় পড়ুন',zh:'以中文阅读本网站',sw:'Soma tovuti hii kwa Kiswahili',ha:'Karanta shafin nan da Hausa'};
   function offer(){
@@ -70,7 +70,7 @@
     if (seen || I.lang !== 'ar' || qs.get('lang')) return;
     const l = (navigator.languages || [navigator.language || '']).map(x => String(x).toLowerCase().split('-')[0]).find(x => x === 'ar' || OFFER[x]);
     if (!l || l === 'ar') return;
-    const b = document.createElement('div'); b.className = 'lang-offer'; b.setAttribute('lang', l); b.setAttribute('dir', ['ur','fa','ps','ku'].includes(l) ? 'rtl' : 'ltr');
+    const b = document.createElement('div'); b.className = 'lang-offer'; b.setAttribute('lang', l); b.setAttribute('dir', ['ur','fa','ps','ku','ug'].includes(l) ? 'rtl' : 'ltr');
     const a = document.createElement('button'); a.type = 'button'; a.className = 'lo-go'; a.textContent = OFFER[l] + ' →';
     const x = document.createElement('button'); x.type = 'button'; x.className = 'lo-x'; x.setAttribute('aria-label', 'إغلاق / Close'); x.textContent = '×';
     a.onclick = () => { b.remove(); choose(l); };
