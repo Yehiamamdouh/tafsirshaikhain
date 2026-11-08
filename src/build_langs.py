@@ -187,9 +187,11 @@ for l,t in L.items():
           f'<div class="cta"><a class="btn pri" href="/tafsir.html?lang={l}">{E(t["open"])}</a><a class="btn sec" href="/">العربية</a></div></section>'
           f'<nav class="suras">{"".join(sur_links)}</nav></main>')
     out(l,'',0,0,page(l,f'{t["site"]} — {t["tag"]}',t['tag'],'',body)); urls.append(f'/{l}/')
-for (l,k),d in packs.items():
-    os.makedirs(f'{P}/lp/{l}',exist_ok=True); json.dump(d,open(f'{P}/lp/{l}/{k}.json','w'),ensure_ascii=False,separators=(',',':'))
-print('packs',len(packs))
+    # write this language's packs now and free them (holding every language's pages at once ran out of memory)
+    for (pl,k),d in packs.items():
+        os.makedirs(f'{P}/lp/{pl}',exist_ok=True); json.dump(d,open(f'{P}/lp/{pl}/{k}.json','w'),ensure_ascii=False,separators=(',',':'))
+    NPACKS=globals().get('NPACKS',0)+len(packs); packs.clear()
+print('packs',globals().get('NPACKS',0))
 # add hreflang to the Arabic static pages and extend the sitemap
 for root,_,files in os.walk(P):
     rel=os.path.relpath(root,P)
