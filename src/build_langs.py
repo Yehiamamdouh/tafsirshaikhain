@@ -79,6 +79,8 @@ L.update(L2)
 # languages whose verse meanings come from QuranEnc but whose UI is shown in a language their readers know
 FALLBACK={"ak": "en", "mos": "fr", "nqo": "fr", "aa": "en", "mdh": "tl"}
 for _l,_src in FALLBACK.items(): L[_l]=dict(L[_src])
+# fallback-UI languages: pages stay reachable for readers but are kept out of Google (noindex, no hreflang, no sitemap)
+NOIDX=set(FALLBACK)
 TDIR={'nqo':'rtl'}  # verse-translation text direction when it differs from the UI
 DYN=set(L)  # all languages are Worker-rendered from packs (static file count stays flat as content grows)
 for _l in L:
@@ -102,7 +104,7 @@ SUR={s:json.load(open(f'{P}/s{s}.json')) for s in range(1,115)}
 def name(l,s): c=CH[s-1]; return c['name'] if l in ('ur','fa','ps','ku','ug') else c['transliteration']
 def alts(path_tail):
     out=f'<link rel="alternate" hreflang="ar" href="{BASE}/{path_tail}">\n<link rel="alternate" hreflang="x-default" href="{BASE}/{path_tail}">\n'
-    return out+''.join(f'<link rel="alternate" hreflang="{k}" href="{BASE}/{k}/{path_tail}">\n' for k in L)
+    return out+''.join(f'<link rel="alternate" hreflang="{k}" href="{BASE}/{k}/{path_tail}">\n' for k in L if k not in NOIDX)
 def crumbs(l,tail):
     t=L[l]; it=[(t['home'],f'/{l}/')]
     m=re.match(r'(ayah|surah)/(\d+)(?:-(\d+))?\.html',tail)
@@ -126,7 +128,7 @@ def ld_extra(l,title,desc,path_tail):
 def page(l,title,desc,path_tail,body):
     t=L[l]; LD=crumbs(l,path_tail); X=ld_extra(l,title,desc,path_tail)
     return (f'<!doctype html>\n<html lang="{l}" dir="{t["dir"]}">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            f'<title>{E(title)}</title>\n<meta name="description" content="{E(desc)}">\n<link rel="canonical" href="{BASE}/{l}/{path_tail}">\n{alts(path_tail)}'
+            f'<title>{E(title)}</title>\n<meta name="description" content="{E(desc)}">\n<link rel="canonical" href="{BASE}/{l}/{path_tail}">\n'+('<meta name="robots" content="noindex,follow">\n' if l in NOIDX else alts(path_tail))+f''
             f'<meta property="og:title" content="{E(title)}">\n<meta property="og:description" content="{E(desc)}">\n<meta property="og:url" content="{BASE}/{l}/{path_tail}">\n'
             f'<meta property="og:site_name" content="{E(t["site"])}">\n<meta property="og:locale" content="{LOC[l]}">\n<meta property="og:type" content="{"article" if path_tail.startswith("ayah/") else "website"}">\n'
             f'<meta name="theme-color" content="#1f4d3a">\n<meta property="og:image" content="https://tafsirshaikhain.com/og.png">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">\n'
@@ -201,9 +203,13 @@ def smap(name,us):
     open(f'{P}/{name}','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc>'+(f'<lastmod>{LM[u][1]}</lastmod>' if u in LM else '')+'</url>\n' for u in us)+'</urlset>\n')
 ar_urls=re.findall(r'<loc>'+re.escape(BASE)+r'(.*?)</loc>',open(P+'/sitemap.xml').read())
 smap('sitemap-ar.xml',ar_urls)
-for l in L: smap(f'sitemap-{l}.xml',[u for u in urls if u.startswith(f'/{l}/')])
+for l in L:
+    if l in NOIDX:
+        if os.path.exists(f'{P}/sitemap-{l}.xml'): os.remove(f'{P}/sitemap-{l}.xml')
+        continue
+    smap(f'sitemap-{l}.xml',[u for u in urls if u.startswith(f'/{l}/')])
 open(P+'/sitemap.xml','w').write('<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    +''.join(f'<sitemap><loc>{BASE}/{n}</loc><lastmod>{today}</lastmod></sitemap>\n' for n in ['sitemap-ar.xml']+[f'sitemap-{l}.xml' for l in L])+'</sitemapindex>\n')
+    +''.join(f'<sitemap><loc>{BASE}/{n}</loc><lastmod>{today}</lastmod></sitemap>\n' for n in ['sitemap-ar.xml']+[f'sitemap-{l}.xml' for l in L if l not in NOIDX])+'</sitemapindex>\n')
 # Arabic home links to the language homes too
 h=open(P+'/index.html').read()
 if 'rel="alternate" hreflang' not in h: open(P+'/index.html','w').write(h.replace('</head>',alts('')+'</head>',1))
