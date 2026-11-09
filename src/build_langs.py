@@ -83,7 +83,7 @@ for _l,_src in FALLBACK.items(): L[_l]=dict(L[_src])
 NOIDX=set(FALLBACK)
 # Nov 2026: search traffic collapsed right after ~200k language URLs appeared, so all language pages are
 # kept out of Google for now (readers can still open them). Put languages in INDEXED to re-enable them.
-INDEXED=set()
+INDEXED={'en'}
 NOIDX|={k for k in L if k not in INDEXED}
 TDIR={'nqo':'rtl'}  # verse-translation text direction when it differs from the UI
 DYN=set(L)  # all languages are Worker-rendered from packs (static file count stays flat as content grows)
