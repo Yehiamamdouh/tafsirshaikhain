@@ -81,6 +81,10 @@ FALLBACK={"ak": "en", "mos": "fr", "nqo": "fr", "aa": "en", "mdh": "tl"}
 for _l,_src in FALLBACK.items(): L[_l]=dict(L[_src])
 # fallback-UI languages: pages stay reachable for readers but are kept out of Google (noindex, no hreflang, no sitemap)
 NOIDX=set(FALLBACK)
+# Nov 2026: search traffic collapsed right after ~200k language URLs appeared, so all language pages are
+# kept out of Google for now (readers can still open them). Put languages in INDEXED to re-enable them.
+INDEXED=set()
+NOIDX|={k for k in L if k not in INDEXED}
 TDIR={'nqo':'rtl'}  # verse-translation text direction when it differs from the UI
 DYN=set(L)  # all languages are Worker-rendered from packs (static file count stays flat as content grows)
 for _l in L:
@@ -103,6 +107,7 @@ def out(l,tail,s,v,h):
 SUR={s:json.load(open(f'{P}/s{s}.json')) for s in range(1,115)}
 def name(l,s): c=CH[s-1]; return c['name'] if l in ('ur','fa','ps','ku','ug') else c['transliteration']
 def alts(path_tail):
+    if all(k in NOIDX for k in L): return ''
     out=f'<link rel="alternate" hreflang="ar" href="{BASE}/{path_tail}">\n<link rel="alternate" hreflang="x-default" href="{BASE}/{path_tail}">\n'
     return out+''.join(f'<link rel="alternate" hreflang="{k}" href="{BASE}/{k}/{path_tail}">\n' for k in L if k not in NOIDX)
 def crumbs(l,tail):
