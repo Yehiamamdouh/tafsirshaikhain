@@ -1,5 +1,5 @@
 // pages: network-first (always fresh after an update); data files: cache-first with background refresh
-const C = 'shaykhain-bb62ac5835';
+const C = 'shaykhain-76367a91a3';
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())
