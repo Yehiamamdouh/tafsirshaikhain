@@ -108,6 +108,22 @@ def crumbs_ld(items):
     return {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":BASE+u} for i,(n,u) in enumerate(items)]}
 AUTH={'IT':{"@type":"Person","name":"أحمد بن عبد الحليم ابن تيمية","alternateName":"شيخ الإسلام ابن تيمية"},
       'IQ':{"@type":"Person","name":"محمد بن أبي بكر ابن قيم الجوزية","alternateName":"ابن القيم"}}
+TASH=re.compile('[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]')
+def plain(t): return TASH.sub('',t).replace('\u0671','ا')
+def refr(d,r):
+    b=d['books'][r['b']]; pg=AR(r['p'])+('–'+AR(r['pe']) if r.get('pe') and r['pe']!=r['p'] else '')
+    return f'<a href="/book/{bslug(b)}.html">«{E(b["t"])}»</a> '+(AR(r['v'])+'/' if r.get('v') else '')+pg
+def full_html(d,items):
+    # the source paragraphs the excerpts above were taken from, verbatim from the data (same text the app shows)
+    B=d.setdefault('_byid',{r['id']:r for r in d['recs']}); seen=[]
+    for x in items:
+        for k in ('r','rr'):
+            try: rid=int(x.get(k))
+            except (TypeError,ValueError): continue
+            if rid in B and rid not in seen: seen.append(rid)
+    if not seen: return ''
+    out=''.join('<div class="fp">'+(f'<b class="fh">{E(B[i]["h"])}</b>' if B[i].get('h') else '')+'<p>'+E(B[i]['t']).replace('\n','<br>')+f'</p><cite>{refr(d,B[i])}</cite></div>' for i in seen)
+    return f'<details class="full"><summary>النص الكامل للفقرة التي أُخذ منها الكلام ({AR(len(seen))})</summary>{out}</details>'
 # verse pages are regenerated from scratch so a verse whose summaries moved away doesn't keep a stale page
 shutil.rmtree(P+'/ayah',ignore_errors=True)
 # التفسير الميسر (QuranEnc, unmodified): the overall meaning on every static verse page, after the imams' words
@@ -145,6 +161,7 @@ for s in range(1,115):
                 sec+='<h3>ما نقله عن غيره</h3>'
                 for x in nq:
                     sec+=f'<blockquote><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{E(x["t"])}»'+(f'<br><b>تعقيبه:</b> {E(x["rt"])}' if x.get('rt') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+            sec+=full_html(d,pts+nq)
             for x in pts+nq:
                 b=d['books'][x['b']]; BOOKS.setdefault(bslug(b),{'b':b,'v':set()})['v'].add((s,v))
             parts.append(sec+'</section>')
@@ -153,15 +170,16 @@ for s in range(1,115):
         if rel:
             relh='<section><h3>آيات ذكرها في كلامه هنا</h3><div class="rel">'+''.join(
                 (f'<a href="/ayah/{c}-{w}.html">' if (c,w) in pages else '<span>')+f'{E(NAMES[c-1])} {AR(w)}'+('</a>' if (c,w) in pages else '</span>') for c,w in rel[:24])+'</div></section>'
-        vt=verses[v-1]; short=' '.join(vt.split()[:7])+('…' if len(vt.split())>7 else '')
+        vt=verses[v-1]; pw=plain(vt).split(); short=' '.join(pw[:5])+('…' if len(pw)>5 else '')
         fam=FAMOUS.get((s,v))
-        title=f'تفسير {fam} [{name}: {v}] — ابن تيمية وابن القيم' if fam else f'تفسير {short} [{name}: {v}] — ابن تيمية وابن القيم'
-        desc=((('قال ابن تيمية: ' if firsta=='IT' else 'قال ابن القيم: ')+first) if first else f'تفسير قوله تعالى ﴿{vt}﴾ بكلام ابن تيمية وابن القيم')[:155]
+        title=f'تفسير {fam or short} ({name} {v}) — ابن تيمية وابن القيم'
+        lead=f'تفسير سورة {name} الآية {v}: '
+        desc=(lead+((('قال ابن تيمية: ' if firsta=='IT' else 'قال ابن القيم: ')+first) if first else f'﴿{plain(vt)}﴾ بكلام ابن تيمية وابن القيم'))[:155]
         i=have.index(v); prv=have[i-1] if i>0 else None; nxt=have[i+1] if i+1<len(have) else None
         nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
               f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+muy_html(s,v)+relh+
-              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (النصوص كاملة)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
+              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
              "mainEntityOfPage":BASE+f'/ayah/{s}-{v}.html',"image":BASE+"/og.png","about":f"سورة {name}، الآية {v}",
