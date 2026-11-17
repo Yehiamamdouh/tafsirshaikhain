@@ -213,7 +213,7 @@ render = function(){
       const pt = pts[i]; if (!pt || li.querySelector('.cpybtn')) return;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'cite cpybtn'; b.textContent = 'انسخ بالإحالة';
       b.addEventListener('click', () => {
-        const txt = '«' + pt.t + '»\n— ' + FULL[a] + '، ' + shortRef(S, pt.b, pt.v, pt.p) + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
+        const txt = '«' + edfix(pt.t, false) + '»\n— ' + FULL[a] + '، ' + shortRef(S, pt.b, pt.v, pt.p) + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
         const done = () => toast('نُسخت الجملة مع الإحالة');
         try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
       });
@@ -222,7 +222,7 @@ render = function(){
       fb.addEventListener('click', () => {
         const r = S.byId.get(pt.r);
         const ref = r ? '«' + S.books[r.b].t + '» ' + refOf(r) : shortRef(S, pt.b, pt.v, pt.p);
-        const txt = '«' + (r ? r.t : (pt.ft || pt.t)) + '»\n— ' + FULL[a] + '، ' + ref + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
+        const txt = '«' + edfix(r ? r.t : (pt.ft || pt.t), false) + '»\n— ' + FULL[a] + '، ' + ref + '\n' + (v ? 'تفسير ' + SURAHS[s].name + ' ' + AR(v) + ' — ' : '') + 'جامع تفسير الشيخين: ' + link;
         const done = () => toast('نُسخت الفقرة كاملة مع الإحالة');
         try { navigator.clipboard.writeText(txt).then(done, () => prompt('انسخ:', txt)); } catch(e){ prompt('انسخ:', txt); }
       });
@@ -275,3 +275,15 @@ render = function(){
   const anchor = (none || !imams.length) ? (document.querySelector('#main .tr-verse') || document.querySelector('#main .verse-title')) : imams[imams.length - 1];
   if (anchor) anchor.after(box);
 };
+
+// ---- display-only clean-up of edition artifacts in the imams' texts (data unchanged; mirrors src/edfix.py) ----
+// 1) a verse reference repeated right after itself -> keep the first; 2) a footnote number glued to an Arabic word
+// outside [...] -> dropped; 3) editor additions [..] without digits -> faint with a tooltip. Verse refs stay as they are.
+function edfix(t, span){
+  t = String(t).replace(/(\[([^\]\[\d:<>]+?):?\s*(\d+)\])\s*\[\s*\2:?\s*\3\]/g, '$1');
+  t = t.split(/(\[[^\[\]]*\])/).map((p, i) => i % 2 ? p : p.replace(/([ء-ي])(\d{1,3})(?=[\s،,.؛:!؟?»"'&<]|$)/g, '$1')).join('');
+  if (span !== false) t = t.replace(/\[([^\[\]\d<>{}]+)\]/g, '<span class="tz" title="زيادة من المحقق">[$1]</span>');
+  return t;
+}
+const _hl0 = highlight;
+highlight = function(text, terms){ return edfix(_hl0(text, terms)); };
