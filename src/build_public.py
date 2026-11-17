@@ -1,5 +1,6 @@
 """Build the public site into REPO/public from site/ (data) + templates in pub/.
 Pages: / (home), /tafsir.html (interactive app), /about.html, /surah/N.html, /ayah/S-V.html (static, indexable), sitemap.xml."""
+import sys; sys.path.insert(0,__import__('os').path.dirname(__file__)); from edfix import fx
 import json, os, re, shutil, sys, glob, html
 T=os.path.dirname(os.path.abspath(__file__))          # templates + scripts (repo/src)
 DATA=os.environ.get('TS_DATA')                         # optional: folder with fresh s*.json/c*.json/si*.json; default = use public/ as-is
@@ -122,7 +123,7 @@ def full_html(d,items):
             except (TypeError,ValueError): continue
             if rid in B and rid not in seen: seen.append(rid)
     if not seen: return ''
-    out=''.join('<div class="fp">'+(f'<b class="fh">{E(B[i]["h"])}</b>' if B[i].get('h') else '')+'<p>'+E(B[i]['t']).replace('\n','<br>')+f'</p><cite>{refr(d,B[i])}</cite></div>' for i in seen)
+    out=''.join('<div class="fp">'+(f'<b class="fh">{E(B[i]["h"])}</b>' if B[i].get('h') else '')+'<p>'+fx(E(B[i]['t'])).replace('\n','<br>')+f'</p><cite>{refr(d,B[i])}</cite></div>' for i in seen)
     return f'<details class="full"><summary>النص الكامل للفقرة التي أُخذ منها الكلام ({AR(len(seen))})</summary>{out}</details>'
 # verse pages are regenerated from scratch so a verse whose summaries moved away doesn't keep a stale page
 shutil.rmtree(P+'/ayah',ignore_errors=True)
@@ -154,13 +155,13 @@ for s in range(1,115):
             who.append(a)
             sec=f'<section><h2>{IMAM[a]}</h2>'
             for x in pts:
-                if not first: first,firsta=x['t'],a
+                if not first: first,firsta=fx(x['t'],False),a
                 rel+=cited(x['t'])
-                sec+=f'<blockquote>{E(x["t"])}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+                sec+=f'<blockquote>{fx(E(x["t"]))}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
             if nq:
                 sec+='<h3>ما نقله عن غيره</h3>'
                 for x in nq:
-                    sec+=f'<blockquote><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{E(x["t"])}»'+(f'<br><b>تعقيبه:</b> {E(x["rt"])}' if x.get('rt') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+                    sec+=f'<blockquote><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{fx(E(x["t"]))}»'+(f'<br><b>تعقيبه:</b> {fx(E(x["rt"]))}' if x.get('rt') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
             sec+=full_html(d,pts+nq)
             for x in pts+nq:
                 b=d['books'][x['b']]; BOOKS.setdefault(bslug(b),{'b':b,'v':set()})['v'].add((s,v))

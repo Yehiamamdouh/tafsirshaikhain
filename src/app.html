@@ -515,7 +515,7 @@ function card(S, r, hl){
       const show = ctx[0].hidden; ctx.forEach(c => c.hidden = !show); b.textContent = show ? 'أخفِ السياق' : 'أظهر السياق';
     }));
   }
-  acts.appendChild(btn('نسخ مع الإحالة', () => copy(r.t + '\n\n— ' + NAME[bk.a] + '، «' + bk.t + '» ' + refOf(r) + (bk.ed ? ' (ط. ' + bk.ed + ')' : ''))));
+  acts.appendChild(btn('نسخ مع الإحالة', () => copy((window.edfix ? edfix(r.t, false) : r.t) + '\n\n— ' + NAME[bk.a] + '، «' + bk.t + '» ' + refOf(r) + (bk.ed ? ' (ط. ' + bk.ed + ')' : ''))));
   if (bk.sh){ const a = document.createElement('a'); a.href = 'https://shamela.ws/book/' + bk.sh; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'الكتاب في الشاملة'; acts.appendChild(a); }
   if (bk.ed){ const s = document.createElement('div'); s.className = 'also'; s.textContent = 'الطبعة: ' + bk.ed; el.appendChild(s); }
   return el;

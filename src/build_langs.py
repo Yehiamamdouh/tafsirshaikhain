@@ -1,6 +1,7 @@
 """Static, indexable verse/surah pages in 5 languages (+ hreflang). Run after build_public.py."""
 import json, os, sys, html, re, shutil
 T=os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0,T); from edfix import fx
 REPO=sys.argv[1]; P=REPO+'/public'; BASE='https://tafsirshaikhain.com'
 E=lambda s: html.escape(str(s), quote=True)
 CH=json.load(open(T+'/data/chapters.json'))['chapters']
@@ -171,8 +172,8 @@ for l,t in L.items():
             for a in ('IT','IQ'):
                 pts=d.get('summ',{}).get(a,{}).get(str(v),[]); nq=d.get('nuq',{}).get(a,{}).get(str(v),[])
                 if not pts and not nq: continue
-                parts+=f'<section><h2>{E(t[a])}</h2>'+''.join(f'<blockquote class="ar" lang="ar">{E(x["t"])}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{E(ref(d,x))}</cite></blockquote>' for x in pts)
-                if nq: parts+=f'<h3>{E(t["quoted"])}</h3>'+''.join(f'<blockquote class="ar" lang="ar"><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span> «{E(x["t"])}»<cite>{E(ref(d,x))}</cite></blockquote>' for x in nq)
+                parts+=f'<section><h2>{E(t[a])}</h2>'+''.join(f'<blockquote class="ar" lang="ar">{fx(E(x["t"]))}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{E(ref(d,x))}</cite></blockquote>' for x in pts)
+                if nq: parts+=f'<h3>{E(t["quoted"])}</h3>'+''.join(f'<blockquote class="ar" lang="ar"><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span> «{fx(E(x["t"]))}»<cite>{E(ref(d,x))}</cite></blockquote>' for x in nq)
                 parts+='</section>'
             vtr=re.sub(r'\[\d+\]','',re.sub(r'^\(\d+\)\s*','',tr[v-1][0])).strip() if v-1<len(tr) else ''
             title=f'{t["tafsir"]} {sn} {s}:{v} — {t["by"]}'
