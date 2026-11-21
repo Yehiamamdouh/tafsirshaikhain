@@ -236,7 +236,7 @@ open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nDisallow: /api/\nSite
 
 # 6) static assets
 for f in ('worker.js','wrangler.jsonc'): shutil.copy2(T+'/'+f,REPO)
-for f in ('i18n.js','qsuggest.js','share.js','quran_clean.json','theme.css','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','_headers'):
+for f in [os.path.basename(x) for x in glob.glob(T+'/*.txt') if re.fullmatch(r'[0-9a-f]{32}\.txt',os.path.basename(x))]+['i18n.js','qsuggest.js','share.js','quran_clean.json','theme.css','sw.js','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','_headers']:
     if os.path.exists(T+'/'+f): shutil.copy2(T+'/'+f,P)
 # service-worker cache version = fingerprint of the data, so every content release replaces old cached surah data
 import hashlib
