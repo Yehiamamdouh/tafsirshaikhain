@@ -39,6 +39,10 @@ and the **content session** (the data in `public/s*.json`). Both then run the bu
 - `build_public.py` rebuilds `public/ayah/` from scratch: a verse whose summaries move away loses its page, and the
   Worker 301-redirects that URL to its surah page. That is expected, not a bug.
 
+## Bing / IndexNow
+After a push that changed pages has deployed, run `python3 src/indexnow.py` (sends URLs whose sitemap lastmod is today;
+`all` or a date also work). The key file `src/<32-hex>.txt` is public by design and is copied to the site root.
+
 ## Content data — do NOT edit here
 `public/s*.json` (verses, summaries `summ`, quotations `nuq`, records) come from a separate content pipeline
 (another Claude session) that verifies every summary verbatim against the books. A website session must not
