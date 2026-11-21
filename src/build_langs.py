@@ -84,7 +84,7 @@ for _l,_src in FALLBACK.items(): L[_l]=dict(L[_src])
 NOIDX=set(FALLBACK)
 # Nov 2026: search traffic collapsed right after ~200k language URLs appeared, so all language pages are
 # kept out of Google for now (readers can still open them). Put languages in INDEXED to re-enable them.
-INDEXED={'en'}
+INDEXED=set()   # keep in sync with INDEXED in src/worker.js (X-Robots-Tag header)
 NOIDX|={k for k in L if k not in INDEXED}
 TDIR={'nqo':'rtl'}  # verse-translation text direction when it differs from the UI
 DYN=set(L)  # all languages are Worker-rendered from packs (static file count stays flat as content grows)
@@ -121,7 +121,7 @@ def crumbs(l,tail):
 LOC={'en':'en_US','ur':'ur_PK','id':'id_ID','tr':'tr_TR','fr':'fr_FR','bn':'bn_BD','ms':'ms_MY','fa':'fa_IR','ru':'ru_RU','sw':'sw_KE','ha':'ha_NG','es':'es_ES','de':'de_DE','zh':'zh_CN','hi':'hi_IN','ps':'ps_AF','so':'so_SO','uz':'uz_UZ','ku':'ckb_IQ','az':'az_AZ','bs':'bs_BA','sq':'sq_AL','ta':'ta_IN','ml':'ml_IN','am':'am_ET','pt':'pt_BR','ff':'ff_SN','om':'om_ET','yo':'yo_NG','ug':'ug_CN','as':'as_IN','te':'te_IN','tg':'tg_TJ','kn':'kn_IN','ky':'ky_KG','gu':'gu_IN','th':'th_TH','tl':'fil_PH','km':'km_KH','si':'si_LK','nl':'nl_NL','sv':'sv_SE','ak':'ak_GH','mos':'mos_BF','nqo':'nqo_GN','aa':'aa_ET','mdh':'mdh_PH'}
 def switcher(l,path_tail):
     o=[f'<a href="/{path_tail}" hreflang="ar" lang="ar" data-l="ar">العربية</a>']
-    o+=[(f'<b lang="{k}">{E(META[k]["name"])}</b>' if k==l else f'<a href="/{k}/{path_tail}" hreflang="{k}" lang="{k}" data-l="{k}">{E(META[k]["name"])}</a>') for k in L]
+    o+=[(f'<b lang="{k}">{E(META[k]["name"])}</b>' if k==l else f'<a href="/{k}/{path_tail}" hreflang="{k}" lang="{k}" data-l="{k}"'+('' if k in INDEXED else ' rel="nofollow"')+'>'+f'{E(META[k]["name"])}</a>') for k in L]
     return '<nav class="langs" aria-label="Language">🌐 '+' · '.join(o)+'</nav>\n'
 def ld_extra(l,title,desc,path_tail):
     t=L[l]; u=f'{BASE}/{l}/{path_tail}'
