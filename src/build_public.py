@@ -35,9 +35,13 @@ stats={'ayat':len(st['ayat']),'IT':st['IT'],'IQ':st['IQ'],'nuq':st['nuq'],
 json.dump(stats,open(P+'/stats.json','w'))
 
 HEAD=open(T+'/head.html').read(); FOOT=open(T+'/footer.html').read()
+ORG={"@type":"Organization","@id":BASE+"/#org","name":"جامع تفسير الشيخين","url":BASE+"/","logo":BASE+"/icon-512.png",
+     "description":"جمع كلام شيخ الإسلام ابن تيمية والإمام ابن القيم في تفسير القرآن من كتبهما، بنصه مع الإحالة إلى الكتاب والجزء والصفحة.",
+     "publishingPrinciples":BASE+"/about.html"}
+ORG_LD='<script type="application/ld+json">'+json.dumps({"@context":"https://schema.org","@graph":[ORG,{"@type":"WebSite","@id":BASE+"/#site","name":"جامع تفسير الشيخين","url":BASE+"/","inLanguage":"ar","publisher":{"@id":BASE+"/#org"}}]},ensure_ascii=False)+'</script>\n'
 def page(title,desc,path,body,jsonld=None):
     h=HEAD.replace('{{TITLE}}',E(title)).replace('{{DESC}}',E(desc)).replace('{{CANON}}',BASE+path).replace('{{GA}}',GA)
-    h=h.replace('{{JSONLD}}','<script type="application/ld+json">'+json.dumps(jsonld,ensure_ascii=False)+'</script>' if jsonld else '')
+    h=h.replace('{{JSONLD}}',ORG_LD+('<script type="application/ld+json">'+json.dumps(jsonld,ensure_ascii=False)+'</script>' if jsonld else ''))
     return h+body+FOOT+'\n</body>\n</html>\n'
 def write(rel,txt):
     p=os.path.join(P,rel); os.makedirs(os.path.dirname(p),exist_ok=True); open(p,'w').write(txt)
@@ -143,6 +147,7 @@ FAMOUS={(2,255):'آية الكرسي',(2,285):'خواتيم سورة البقر�
         (4,176):'آية الكلالة',(16,90):'آية العدل والإحسان',(17,23):'آية بر الوالدين',(2,256):'آية لا إكراه في الدين',(39,53):'آية الرجاء'}
 urls=['/','/about.html','/privacy.html']
 pages={(s,v) for s in range(1,115) for k in ('summ','nuq') for a in ('IT','IQ') for v in map(int,SUR[s].get(k,{}).get(a,{})) if v>=1}
+THIN=120; THIN_N=[]
 BOOKS={}   # slug -> {'b':book,'v':set((s,v))}
 for s in range(1,115):
     d=SUR[s]; name=NAMES[s-1]; verses=[v['text'] for v in Q[str(s)]]
@@ -179,15 +184,27 @@ for s in range(1,115):
         i=have.index(v); prv=have[i-1] if i>0 else None; nxt=have[i+1] if i+1<len(have) else None
         nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+muy_html(s,v)+relh+
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+'<p class="meth">كلام الإمامين منقول بنصه من كتبهما مع الإحالة إلى الجزء والصفحة، ومطابَق آليًا مع أصله. <a href="/about.html">منهج العمل والمصادر</a></p>'+muy_html(s,v)+relh+
               f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
              "mainEntityOfPage":BASE+f'/ayah/{s}-{v}.html',"image":BASE+"/og.png","about":f"سورة {name}، الآية {v}",
-             "author":[AUTH[a] for a in who],"isPartOf":{"@type":"WebSite","name":"جامع تفسير الشيخين","url":BASE+"/"}},
+             "author":[AUTH[a] for a in who],"isPartOf":{"@id":BASE+"/#site"},"publisher":{"@id":BASE+"/#org"}},
             crumbs_ld([('الرئيسية','/'),(f'سورة {name}',f'/surah/{s}.html'),(f'الآية {v}',f'/ayah/{s}-{v}.html')])]}
-        write(f'ayah/{s}-{v}.html',page(title,desc,f'/ayah/{s}-{v}.html',body,ld)); urls.append(f'/ayah/{s}-{v}.html')
-    vl=''.join(f'<a class="vrow" href="/ayah/{s}-{v}.html"><b>{AR(v)}</b> <span>{E(" ".join(verses[v-1].split()[:8]))}…</span></a>' for v in have)
+        html_=page(title,desc,f'/ayah/{s}-{v}.html',body,ld)
+        # very short verse pages stay readable but out of search engines until the site's standing recovers (Nov 2026)
+        words=len(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b.*?</\1>','',re.search(r'<main\b.*?</main>',body,re.S).group(0),flags=re.S)).split())
+        if words<THIN: html_=html_.replace('<link rel="canonical"','<meta name="robots" content="noindex,follow">\n<link rel="canonical"',1); THIN_N.append(f'{s}-{v}')
+        else: urls.append(f'/ayah/{s}-{v}.html')
+        write(f'ayah/{s}-{v}.html',html_)
+    def lead_of(v):
+        for a in ('IT','IQ'):
+            l=d.get('summ',{}).get(a,{}).get(str(v),[])
+            if l:
+                t=fx(l[0]['t'],False); cut=t if len(t)<=220 else t[:220].rsplit(' ',1)[0]+'…'
+                return f'<p class="vsum"><b>{"ابن تيمية" if a=="IT" else "ابن القيم"}:</b> {E(cut)}</p>'
+        return ''
+    vl=''.join(f'<div class="vitem"><a class="vrow" href="/ayah/{s}-{v}.html"><b>{AR(v)}</b> <span>{E(" ".join(verses[v-1].split()[:8]))}…</span></a>{lead_of(v)}</div>' for v in have)
     sp=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › سورة {E(name)}</nav><h1>تفسير سورة {E(name)} عند ابن تيمية وابن القيم</h1>'
         f'<section><p>الآيات التي جُمع فيها كلام الشيخين من سورة {E(name)} ({AR(len(have))} من {AR(len(verses))} آية):</p><div class="vrows">{vl or "—"}</div></section>'
         f'<a class="btn pri open" href="/tafsir.html#s{s}a{1 if s>1 else 0}">افتح السورة في التفسير التفاعلي</a></main>')
@@ -254,5 +271,6 @@ for s in range(1,115):
     json.dump(rows,open(f'{P}/tr/muyassar/{s}.json','w'),ensure_ascii=False,separators=(',',':'))
 json.dump({'title':ed['name'],'credit':'التفسير الميسر، مجمع الملك فهد لطباعة المصحف الشريف','version':ed['version'],
            'url':'https://quranenc.com/ar/browse/arabic_moyassar','transcript':ed.get('transcript','')},open(P+'/tr/muyassar/meta.json','w'),ensure_ascii=False)
+print('thin verse pages (noindex):',len(THIN_N))
 print('built; pages',len(urls),'stats',stats)
 import subprocess; subprocess.run([sys.executable,T+'/build_langs.py',REPO],check=True)
