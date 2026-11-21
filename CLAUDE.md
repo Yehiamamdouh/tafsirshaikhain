@@ -1,7 +1,8 @@
 # جامع تفسير الشيخين — tafsirshaikhain.com
 
 Interactive tafsir of Ibn Taymiyya (IT) and Ibn al-Qayyim (IQ). Owner talks in Egyptian Arabic; reply in Arabic.
-Footer credit is "Developed by Doers" only — never put the owner's name on the site.
+Footer credit is "Developed by Doers" only — never put the owner's name in the footer or elsewhere, except the
+«الإشراف العلمي» section of the about page (+ the Organization JSON-LD), which the owner asked for (Nov 2026).
 
 ## Layout
 - `public/` — the deployed site (Cloudflare Workers static assets). **Generated** — don't hand-edit.
