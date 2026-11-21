@@ -37,7 +37,8 @@ json.dump(stats,open(P+'/stats.json','w'))
 HEAD=open(T+'/head.html').read(); FOOT=open(T+'/footer.html').read()
 ORG={"@type":"Organization","@id":BASE+"/#org","name":"جامع تفسير الشيخين","url":BASE+"/","logo":BASE+"/icon-512.png",
      "description":"جمع كلام شيخ الإسلام ابن تيمية والإمام ابن القيم في تفسير القرآن من كتبهما، بنصه مع الإحالة إلى الكتاب والجزء والصفحة.",
-     "publishingPrinciples":BASE+"/about.html"}
+     "publishingPrinciples":BASE+"/about.html",
+     "member":{"@type":"Person","name":"يحيى دسوقي","jobTitle":"المشرف العلمي","description":"طالب علوم القرآن والعلوم الشرعية في أكثر من أكاديمية"}}
 ORG_LD='<script type="application/ld+json">'+json.dumps({"@context":"https://schema.org","@graph":[ORG,{"@type":"WebSite","@id":BASE+"/#site","name":"جامع تفسير الشيخين","url":BASE+"/","inLanguage":"ar","publisher":{"@id":BASE+"/#org"}}]},ensure_ascii=False)+'</script>\n'
 def page(title,desc,path,body,jsonld=None):
     h=HEAD.replace('{{TITLE}}',E(title)).replace('{{DESC}}',E(desc)).replace('{{CANON}}',BASE+path).replace('{{GA}}',GA)
