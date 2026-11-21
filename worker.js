@@ -12,6 +12,8 @@ const hdr = s => "=?UTF-8?B?" + b64(s) + "?=";
 const recent = new Map();
 // Verse/surah pages for all non-Arabic languages: pre-rendered HTML lives in /lp/{lang}/{surah}_{chunk}.json
 const DYN = /^\/(en|ur|id|tr|fr|bn|ms|fa|ru|sw|ha|es|de|zh|hi|ps|so|uz|ku|az|bs|sq|ta|ml|am|pt|ff|om|yo|ug|as|te|tg|kn|ky|gu|th|tl|km|si|nl|sv|ak|mos|nqo|aa|mdh)(?:\/(?:(ayah\/(\d{1,3})-(\d{1,3})|surah\/(\d{1,3}))\.html)?)?$/;
+// languages Google may index; every other language page is served with X-Robots-Tag: noindex (keep in sync with INDEXED in src/build_langs.py)
+const INDEXED = new Set([]);
 async function langPage(req, env, url, m) {
   const [, l, , as, av, ss] = m;
   if (url.pathname === "/" + l) return Response.redirect(url.origin + "/" + l + "/", 301);
@@ -24,7 +26,9 @@ async function langPage(req, env, url, m) {
   const html = r.ok ? (await r.json())[key] : null;
   if (!html && as && +as >= 1 && +as <= 114) return Response.redirect(url.origin + "/" + l + "/surah/" + as + ".html", 301);
   if (!html) { const nf = await env.ASSETS.fetch(new Request(url.origin + "/404.html")); return new Response(nf.body, { status: 404, headers: nf.headers }); }
-  const res = new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" } });
+  const headers = { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=3600" };
+  if (!INDEXED.has(l)) headers["x-robots-tag"] = "noindex, follow";
+  const res = new Response(html, { headers });
   if (req.method === "GET") await cache.put(req, res.clone());
   return res;
 } // soft per-isolate rate limit
