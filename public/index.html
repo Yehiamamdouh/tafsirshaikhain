@@ -47,7 +47,7 @@
 .muy-text{margin:0;font-family:var(--f-read,serif);font-size:17px;line-height:1.95;overflow-wrap:anywhere}
 .muy-fn{margin:0;font-size:14px;line-height:1.7;color:var(--muted,#5b6676);white-space:pre-line}
 .muy-credit{font-size:12px;color:var(--muted,#5b6676);overflow-wrap:anywhere}
-.lang-offer{display:flex;gap:8px;align-items:center;justify-content:center;max-width:860px;margin:0 auto 12px;padding:8px 12px;border-radius:10px;background:var(--lapis-soft,#e3ebf6);font-family:system-ui,sans-serif}
+.lang-offer{display:flex;gap:8px;align-items:center;justify-content:center;position:fixed;inset-inline:12px;bottom:12px;z-index:60;max-width:560px;margin:0 auto;box-shadow:0 4px 18px rgba(0,0,0,.18);padding:8px 12px;border-radius:10px;background:var(--lapis-soft,#e3ebf6);font-family:system-ui,sans-serif}
 .lo-go{font:inherit;font-size:15px;font-weight:600;background:none;border:0;color:var(--lapis,#1f4f8f);cursor:pointer;text-decoration:underline}
 .lo-x{font:inherit;font-size:20px;line-height:1;background:none;border:0;color:var(--muted,#5b6676);cursor:pointer;padding:0 4px}
 header.top #langsel{justify-self:end}
@@ -71,14 +71,16 @@ html[data-ldir=ltr] input:placeholder-shown{direction:ltr}
 <script src="/qsuggest.js"></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://tafsirshaikhain.com/#org", "name": "جامع تفسير الشيخين", "url": "https://tafsirshaikhain.com/", "logo": "https://tafsirshaikhain.com/icon-512.png", "description": "جمع كلام شيخ الإسلام ابن تيمية والإمام ابن القيم في تفسير القرآن من كتبهما، بنصه مع الإحالة إلى الكتاب والجزء والصفحة.", "publishingPrinciples": "https://tafsirshaikhain.com/about.html", "member": {"@type": "Person", "name": "يحيى دسوقي", "jobTitle": "المشرف العلمي", "description": "طالب علوم القرآن والعلوم الشرعية في أكثر من أكاديمية"}}, {"@type": "WebSite", "@id": "https://tafsirshaikhain.com/#site", "name": "جامع تفسير الشيخين", "url": "https://tafsirshaikhain.com/", "inLanguage": "ar", "publisher": {"@id": "https://tafsirshaikhain.com/#org"}}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "جامع تفسير الشيخين", "url": "https://tafsirshaikhain.com/", "inLanguage": "ar", "potentialAction": {"@type": "SearchAction", "target": "https://tafsirshaikhain.com/tafsir.html?q={q}", "query-input": "required name=q"}}</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ER9F5C2HC1"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-ER9F5C2HC1',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-ER9F5C2HC1',{allow_google_signals:false,allow_ad_personalization_signals:false});
+/* load gtag.js after the page has loaded and gone idle, so it never competes with the first paint (queued calls above are sent then) */
+addEventListener('load',function(){var go=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-ER9F5C2HC1';document.head.appendChild(s)};('requestIdleCallback' in window)?requestIdleCallback(go,{timeout:3000}):setTimeout(go,1500)});</script>
 
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap"></noscript>
 <style>
 /* Layout: a reading desk — the surah is the index; for each verse, each imam has his own short sheet, with a drawer of full texts beneath it. */
 :root{
@@ -219,7 +221,8 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 .nav{display:flex;justify-content:space-between;gap:8px}
 .nav button{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
 .nav button:disabled{opacity:.4;cursor:default}
-.loading{padding:24px;text-align:center;color:var(--muted)}
+.loading{padding:24px;text-align:center;color:var(--muted);min-height:70vh}
+#ayat:empty{min-height:340px}
 .note{font-size:12.5px;color:var(--muted)}
 :root{--ok:#2f6b3f;--ok-soft:#e5f1e8;--no:#9b2c2c;--no-soft:#f7e4e4}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}}

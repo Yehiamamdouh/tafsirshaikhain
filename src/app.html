@@ -2,7 +2,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Naskh+Arabic:wght@400;600;700&family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap"></noscript>
 <style>
 /* Layout: a reading desk — the surah is the index; for each verse, each imam has his own short sheet, with a drawer of full texts beneath it. */
 :root{
@@ -143,7 +144,8 @@ details.about ul{padding-inline-start:20px;margin:6px 0}
 .nav{display:flex;justify-content:space-between;gap:8px}
 .nav button{font:inherit;font-size:13.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
 .nav button:disabled{opacity:.4;cursor:default}
-.loading{padding:24px;text-align:center;color:var(--muted)}
+.loading{padding:24px;text-align:center;color:var(--muted);min-height:70vh}
+#ayat:empty{min-height:340px}
 .note{font-size:12.5px;color:var(--muted)}
 :root{--ok:#2f6b3f;--ok-soft:#e5f1e8;--no:#9b2c2c;--no-soft:#f7e4e4}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#8fd0a0;--ok-soft:#18301f;--no:#f0a3a3;--no-soft:#3a1d1d}}
