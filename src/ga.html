@@ -1,2 +1,3 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id={{GA_ID}}"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','{{GA_ID}}',{allow_google_signals:false,allow_ad_personalization_signals:false});</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','{{GA_ID}}',{allow_google_signals:false,allow_ad_personalization_signals:false});
+/* load gtag.js after the page has loaded and gone idle, so it never competes with the first paint (queued calls above are sent then) */
+addEventListener('load',function(){var go=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id={{GA_ID}}';document.head.appendChild(s)};('requestIdleCallback' in window)?requestIdleCallback(go,{timeout:3000}):setTimeout(go,1500)});</script>
