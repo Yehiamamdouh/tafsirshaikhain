@@ -330,10 +330,6 @@ nf=page('الصفحة غير موجودة — جامع تفسير الشيخين
         style+'<main class="sp"><h1>الصفحة غير موجودة</h1><p lang="en" dir="ltr">Page not found.</p><a class="btn pri open" href="/">الرئيسية · Home</a></main>')
 write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<meta name="robots" content="noindex">'))
 shutil.copy2(T+'/og.png',P)
-for u in urls:
-    f=P+(u+'index.html' if u.endswith('/') else u)
-    if os.path.exists(f): touch(u,open(f).read())
-open(LM_F,'w').write('{\n'+',\n'.join(json.dumps(k,ensure_ascii=False)+':'+json.dumps(LM[k]) for k in sorted(LM))+'\n}\n')  # one URL per line keeps git diffs small
 shutil.rmtree(P+'/topic',ignore_errors=True)
 def topic_items_html(tp):
     out=''
@@ -387,6 +383,10 @@ if TOPICS:
     urls.append('/topics.html')
     print('topics:',len(TOPICS),'pages:',sum(1 for t in TOPICS if t['_page']),'bad items skipped:',len(TOPIC_BAD))
     for b_ in TOPIC_BAD[:10]: print('  WARNING topic item does not match the data:',b_)
+for u in urls:
+    f=P+(u+'index.html' if u.endswith('/') else u)
+    if os.path.exists(f): touch(u,open(f).read())
+open(LM_F,'w').write('{\n'+',\n'.join(json.dumps(k,ensure_ascii=False)+':'+json.dumps(LM[k]) for k in sorted(LM))+'\n}\n')  # one URL per line keeps git diffs small
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+''.join(f'<url><loc>{BASE}{u}</loc></url>\n' for u in urls)+'</urlset>\n'
 open(P+'/sitemap.xml','w').write(sm)
 open(P+'/robots.txt','w').write(f'User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {BASE}/sitemap.xml\n')
