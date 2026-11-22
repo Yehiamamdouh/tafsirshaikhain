@@ -209,6 +209,27 @@ def nav_of(s,have,lo,hi):
 def words_of(body):
     return len(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b.*?</\1>','',re.search(r'<main\b.*?</main>',body,re.S).group(0),flags=re.S)).split())
 PASS_N=0
+# topic index (content session: public/topics.json) — a classification only: every item points at an existing excerpt
+# {su,v,a,i,kind:'summ'|'nuq',t0}; t0 (first 40 chars) must match the excerpt or the item is skipped with a warning
+TOPICS=json.load(open(P+'/topics.json')) if os.path.exists(P+'/topics.json') else []
+TOPIC_MIN=5; TOPIC_OF={}; TOPIC_BAD=[]
+for tp in TOPICS:
+    ok=[]
+    for it in tp.get('items',[]):
+        try: x=SUR[it['su']][it.get('kind','summ')][it['a']][str(it['v'])][it['i']]
+        except (KeyError,IndexError,TypeError): x=None
+        if not x or (it.get('t0') and not x['t'].startswith(it['t0'])): TOPIC_BAD.append((tp['id'],it)); continue
+        ok.append((it['su'],it['v'],it['a'],it.get('kind','summ'),x))
+    tp['_ok']=sorted(ok,key=lambda q:(q[2],q[0],q[1]))
+    tp['_page']=len(ok)>=TOPIC_MIN
+    for q in ok: TOPIC_OF.setdefault((q[0],q[1]),[]).append(tp)
+def topic_tags(keys):
+    tl=[]; 
+    for k in keys:
+        for tp in TOPIC_OF.get(k,[]):
+            if tp not in tl: tl.append(tp)
+    if not tl: return ''
+    return '<p class="ttags"><b>الموضوعات:</b> '+' '.join(f'<a href="/topic/{tp["id"]}.html">{E(tp["title"])}</a>' if tp['_page'] else f'<a href="/topics.html#{tp["id"]}">{E(tp["title"])}</a>' for tl_ in [tl] for tp in tl_)+'</p>'
 for s in range(1,115):
     d=SUR[s]; name=NAMES[s-1]; verses=[v['text'] for v in Q[str(s)]]
     have=sorted(v for (ss,v) in pages if ss==s)
@@ -222,7 +243,7 @@ for s in range(1,115):
         g=GOF.get((s,v))
         note=(f'<p class="pnote">هذه الآية من مقطع شرحه الإمام بكلام واحد: <a href="/passage/{s}-{g[0]}-{g[1]}.html">تفسير الآيات {AR(g[0])}–{AR(g[1])} معًا</a></p>' if g else '')
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+note+''.join(parts)+METH+muy_html(s,v)+relh+
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+note+''.join(parts)+METH+topic_tags([(s,v)])+muy_html(s,v)+relh+
               f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav_of(s,have,v,v)+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
@@ -256,7 +277,7 @@ for s in range(1,115):
         vlinks='<p class="pnote">الآيات منفردة: '+' · '.join(f'<a href="/ayah/{s}-{w}.html">الآية {AR(w)}</a>' for w in vs)+'</p>'
         path=f'/passage/{s}-{lo}-{hi}.html'
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآيات {AR(lo)}–{AR(hi)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآيات {AR(lo)}–{AR(hi)}'+(f' — {E(fam)}' if fam else '')+f'</h1>{vts}'+''.join(parts)+METH+muys+relh+vlinks+
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآيات {AR(lo)}–{AR(hi)}'+(f' — {E(fam)}' if fam else '')+f'</h1>{vts}'+''.join(parts)+METH+topic_tags([(s,w) for w in vs])+muys+relh+vlinks+
               f'<a class="btn pri open" href="/tafsir.html#s{s}a{lo}">افتح الآيات في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav_of(s,have,lo,hi)+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+path,"mainEntityOfPage":BASE+path,"image":BASE+"/og.png",
@@ -309,6 +330,59 @@ nf=page('الصفحة غير موجودة — جامع تفسير الشيخين
         style+'<main class="sp"><h1>الصفحة غير موجودة</h1><p lang="en" dir="ltr">Page not found.</p><a class="btn pri open" href="/">الرئيسية · Home</a></main>')
 write('404.html',nf.replace('<link rel="canonical" href="'+BASE+'/404.html">','<meta name="robots" content="noindex">'))
 shutil.copy2(T+'/og.png',P)
+shutil.rmtree(P+'/topic',ignore_errors=True)
+def topic_items_html(tp):
+    out=''
+    for a in ('IT','IQ'):
+        rows=[q for q in tp['_ok'] if q[2]==a]
+        if not rows: continue
+        out+=f'<section><h2>{IMAM[a]}</h2>'
+        for su,v,_,kind,x in rows:
+            d=SUR[su]; lab=f'{E(NAMES[su-1])} {AR(v)}' if v else f'سورة {E(NAMES[su-1])}'
+            href=curl(su,v) if (su,v) in pages else f'/surah/{su}.html'
+            body_=(f'<span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{fx(E(x["t"]))}»' if kind=='nuq' else fx(E(x['t'])))
+            out+=f'<blockquote><a class="tv" href="{href}">﴿{lab}﴾</a> {body_}<cite>{ref(d,x)}</cite></blockquote>'
+        out+='</section>'
+    return out
+if TOPICS:
+    tl=''
+    TID={tp['id']:tp for tp in TOPICS}
+    KIDS={}
+    for tp in TOPICS:
+        if tp.get('parent') in TID: KIDS.setdefault(tp['parent'],[]).append(tp)
+    def tlink(tp): return f'/topic/{tp["id"]}.html' if tp['_page'] else f'/topics.html#{tp["id"]}'
+    # index order: each top-level topic followed by its sub-topics
+    ORDER=[]
+    for tp in TOPICS:
+        if tp.get('parent') in TID: continue
+        ORDER.append(tp); ORDER+=KIDS.get(tp['id'],[])
+    for tp in ORDER:
+        n=len(tp['_ok'])
+        if not n: continue
+        par=TID.get(tp.get('parent'))
+        kids=[k for k in KIDS.get(tp['id'],[]) if k['_ok']]
+        kidh=('<section><h2>موضوعات فرعية</h2><div class="rel">'+''.join(f'<a href="{tlink(k)}">{E(k["title"])}</a>' for k in kids)+'</div></section>') if kids else ''
+        crumb_par=(f'<a href="{tlink(par)}">{E(par["title"])}</a> › ' if par else '')
+        intro=f'<p class="tintro">{E(tp["intro"])} <small>(تعريف من إعداد الموقع)</small></p>' if tp.get('intro') else ''
+        if tp['_page']:
+            path=f'/topic/{tp["id"]}.html'
+            body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/topics.html">الموضوعات</a> › '+crumb_par+f'{E(tp["title"])}</nav>'
+                  f'<h1>{E(tp["title"])} في تفسير ابن تيمية وابن القيم</h1>{intro}<p>{AR(n)} موضعًا من كلام الإمامين، مرتبة بترتيب المصحف، كل نص بلفظه مع آيته ومصدره.</p>'
+                  +kidh+topic_items_html(tp)+METH+'</main>')
+            x0=tp['_ok'][0][4]
+            ld={"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":tp['title'],"inLanguage":"ar","url":BASE+path,"isPartOf":{"@id":BASE+"/#site"},"publisher":{"@id":BASE+"/#org"}},
+                crumbs_ld([('الرئيسية','/'),('الموضوعات','/topics.html')]+([(par['title'],tlink(par))] if par else [])+[(tp['title'],path)])]}
+            write(path[1:],page(f'{tp["title"]} — تفسير ابن تيمية وابن القيم',(f'{tp["title"]} في كلام ابن تيمية وابن القيم: {AR(n)} موضعًا بنصها مع الآية والمصدر. '+fx(x0['t'],False))[:155],path,body,ld)); urls.append(path)
+            tl+=f'<div class="vitem{" vsub" if par else ""}"><a class="vrow" id="{tp["id"]}" href="{path}"><b>{E(tp["title"])}</b> <span>{AR(n)} موضعًا</span></a></div>'
+        else:
+            tl+=f'<div class="vitem{" vsub" if par else ""}" id="{tp["id"]}"><p class="vrow"><b>{E(tp["title"])}</b> <span>{AR(n)}</span></p>{intro}'+topic_items_html(tp)+'</div>'
+    body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › الموضوعات</nav><h1>الفهرس الموضوعي لتفسير ابن تيمية وابن القيم</h1>'
+          f'<p>كلام الإمامين مصنفًا على الموضوعات؛ التصنيف من إعداد الموقع، والنصوص بلفظها كما في كتبهما.</p><div class="vrows">{tl}</div>'+METH+'</main>')
+    write('topics.html',page('الفهرس الموضوعي — تفسير ابن تيمية وابن القيم','كلام شيخ الإسلام ابن تيمية والإمام ابن القيم في تفسير القرآن مصنفًا على الموضوعات، بنصه مع الآية والمصدر.','/topics.html',body,
+          {"@context":"https://schema.org","@type":"CollectionPage","name":"الفهرس الموضوعي","inLanguage":"ar","url":BASE+"/topics.html"}))
+    urls.append('/topics.html')
+    print('topics:',len(TOPICS),'pages:',sum(1 for t in TOPICS if t['_page']),'bad items skipped:',len(TOPIC_BAD))
+    for b_ in TOPIC_BAD[:10]: print('  WARNING topic item does not match the data:',b_)
 for u in urls:
     f=P+(u+'index.html' if u.endswith('/') else u)
     if os.path.exists(f): touch(u,open(f).read())
