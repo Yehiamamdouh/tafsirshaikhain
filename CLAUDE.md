@@ -14,6 +14,7 @@ Footer credit is "Developed by Doers" only — never put the owner's name in the
   - `head.html`, `footer.html`, `theme.css`, `home.html` (shaykh bios), `about.html`, `privacy.html`,
     `patch.js` (app add-ons), `qsuggest.js` (Quran-text verse finder), `i18n.js` + `i18n/` (UI strings), `sw.js`.
   - `data/simple.json` (Tanzil Quran text), `data/chapters.json` (surah names).
+- `pipeline/` — content-session scripts and reviewer briefs (not deployed; website session doesn't edit it). See its README.
 - `worker.js` + `wrangler.jsonc` are copied to the repo root by the build. Worker: `/api/feedback`
   (Turnstile + Email Routing; secrets live in the Cloudflare dashboard only) and language pages.
 
