@@ -342,29 +342,44 @@ def topic_items_html(tp):
         if not rows: continue
         out+=f'<section><h2>{IMAM[a]}</h2>'
         for su,v,_,kind,x in rows:
-            d=SUR[su]; lab=f'{E(NAMES[su-1])} {AR(v)}'
+            d=SUR[su]; lab=f'{E(NAMES[su-1])} {AR(v)}' if v else f'سورة {E(NAMES[su-1])}'
+            href=curl(su,v) if (su,v) in pages else f'/surah/{su}.html'
             body_=(f'<span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{fx(E(x["t"]))}»' if kind=='nuq' else fx(E(x['t'])))
-            out+=f'<blockquote><a class="tv" href="{curl(su,v)}">﴿{lab}﴾</a> {body_}<cite>{ref(d,x)}</cite></blockquote>'
+            out+=f'<blockquote><a class="tv" href="{href}">﴿{lab}﴾</a> {body_}<cite>{ref(d,x)}</cite></blockquote>'
         out+='</section>'
     return out
 if TOPICS:
     tl=''
+    TID={tp['id']:tp for tp in TOPICS}
+    KIDS={}
     for tp in TOPICS:
+        if tp.get('parent') in TID: KIDS.setdefault(tp['parent'],[]).append(tp)
+    def tlink(tp): return f'/topic/{tp["id"]}.html' if tp['_page'] else f'/topics.html#{tp["id"]}'
+    # index order: each top-level topic followed by its sub-topics
+    ORDER=[]
+    for tp in TOPICS:
+        if tp.get('parent') in TID: continue
+        ORDER.append(tp); ORDER+=KIDS.get(tp['id'],[])
+    for tp in ORDER:
         n=len(tp['_ok'])
         if not n: continue
+        par=TID.get(tp.get('parent'))
+        kids=[k for k in KIDS.get(tp['id'],[]) if k['_ok']]
+        kidh=('<section><h2>موضوعات فرعية</h2><div class="rel">'+''.join(f'<a href="{tlink(k)}">{E(k["title"])}</a>' for k in kids)+'</div></section>') if kids else ''
+        crumb_par=(f'<a href="{tlink(par)}">{E(par["title"])}</a> › ' if par else '')
         intro=f'<p class="tintro">{E(tp["intro"])} <small>(تعريف من إعداد الموقع)</small></p>' if tp.get('intro') else ''
         if tp['_page']:
             path=f'/topic/{tp["id"]}.html'
-            body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/topics.html">الموضوعات</a> › {E(tp["title"])}</nav>'
+            body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/topics.html">الموضوعات</a> › '+crumb_par+f'{E(tp["title"])}</nav>'
                   f'<h1>{E(tp["title"])} في تفسير ابن تيمية وابن القيم</h1>{intro}<p>{AR(n)} موضعًا من كلام الإمامين، مرتبة بترتيب المصحف، كل نص بلفظه مع آيته ومصدره.</p>'
-                  +topic_items_html(tp)+METH+'</main>')
+                  +kidh+topic_items_html(tp)+METH+'</main>')
             x0=tp['_ok'][0][4]
             ld={"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":tp['title'],"inLanguage":"ar","url":BASE+path,"isPartOf":{"@id":BASE+"/#site"},"publisher":{"@id":BASE+"/#org"}},
-                crumbs_ld([('الرئيسية','/'),('الموضوعات','/topics.html'),(tp['title'],path)])]}
+                crumbs_ld([('الرئيسية','/'),('الموضوعات','/topics.html')]+([(par['title'],tlink(par))] if par else [])+[(tp['title'],path)])]}
             write(path[1:],page(f'{tp["title"]} — تفسير ابن تيمية وابن القيم',(f'{tp["title"]} في كلام ابن تيمية وابن القيم: {AR(n)} موضعًا بنصها مع الآية والمصدر. '+fx(x0['t'],False))[:155],path,body,ld)); urls.append(path)
-            tl+=f'<div class="vitem"><a class="vrow" id="{tp["id"]}" href="{path}"><b>{E(tp["title"])}</b> <span>{AR(n)} موضعًا</span></a></div>'
+            tl+=f'<div class="vitem{" vsub" if par else ""}"><a class="vrow" id="{tp["id"]}" href="{path}"><b>{E(tp["title"])}</b> <span>{AR(n)} موضعًا</span></a></div>'
         else:
-            tl+=f'<div class="vitem" id="{tp["id"]}"><p class="vrow"><b>{E(tp["title"])}</b> <span>{AR(n)}</span></p>{intro}'+topic_items_html(tp)+'</div>'
+            tl+=f'<div class="vitem{" vsub" if par else ""}" id="{tp["id"]}"><p class="vrow"><b>{E(tp["title"])}</b> <span>{AR(n)}</span></p>{intro}'+topic_items_html(tp)+'</div>'
     body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › الموضوعات</nav><h1>الفهرس الموضوعي لتفسير ابن تيمية وابن القيم</h1>'
           f'<p>كلام الإمامين مصنفًا على الموضوعات؛ التصنيف من إعداد الموقع، والنصوص بلفظها كما في كتبهما.</p><div class="vrows">{tl}</div>'+METH+'</main>')
     write('topics.html',page('الفهرس الموضوعي — تفسير ابن تيمية وابن القيم','كلام شيخ الإسلام ابن تيمية والإمام ابن القيم في تفسير القرآن مصنفًا على الموضوعات، بنصه مع الآية والمصدر.','/topics.html',body,
