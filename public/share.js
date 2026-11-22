@@ -1,13 +1,13 @@
 // share button for the static verse pages (/ayah/S-V.html): verse + the imams' summary quotations verbatim + refs + link
 (function(){
-  const vt = document.querySelector('main.sp .vt'), h1 = document.querySelector('main.sp h1');
+  const vts = [...document.querySelectorAll('main.sp .vt')], vt = vts[0], h1 = document.querySelector('main.sp h1');
   if (!vt || !h1) return;
-  const m = /سورة\s+(.+?)،\s*الآية\s+(\S+)/.exec(h1.textContent); if (!m) return;
-  const title = 'تفسير الآية ' + m[2] + ' من سورة ' + m[1] + ' — ابن تيمية وابن القيم';
+  const m = /سورة\s+(.+?)،\s*(?:الآية|الآيات)\s+(\S+)/.exec(h1.textContent); if (!m) return;
+  const title = (vts.length > 1 ? 'تفسير الآيات ' : 'تفسير الآية ') + m[2] + ' من سورة ' + m[1] + ' — ابن تيمية وابن القيم';
   const url = location.origin + location.pathname;
   const toast = msg => { const t = document.createElement('div'); t.textContent = msg; t.setAttribute('role', 'status'); t.style.cssText = 'position:fixed;inset-inline:16px;bottom:24px;margin:auto;max-width:320px;text-align:center;background:#18212e;color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;z-index:9'; document.body.appendChild(t); setTimeout(() => t.remove(), 1800); };
   const fullText = () => {
-    const parts = [vt.textContent.trim() + ' [' + m[1] + ': ' + m[2] + ']'];
+    const parts = [vts.map(e => e.textContent.trim()).join(' ') + ' [' + m[1] + ': ' + m[2] + ']'];
     document.querySelectorAll('main.sp > section').forEach(sec => {
       const h2 = sec.querySelector('h2'); if (!h2) return;
       const items = [];
@@ -43,7 +43,7 @@
     else menu.hidden = !menu.hidden;
   });
   wrap.append(b, menu);
-  vt.insertAdjacentElement('afterend', wrap);
+  vts[vts.length - 1].insertAdjacentElement('afterend', wrap);
 })();
 
 // «انسخ بالإحالة» under each summary quotation on the static verse pages

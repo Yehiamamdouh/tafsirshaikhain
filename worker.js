@@ -45,6 +45,9 @@ export default {
       // a verse with no page (e.g. its summaries were moved to another verse) → its surah page
       const av = r.status === 404 && url.pathname.match(/^\/ayah\/(\d{1,3})-\d{1,3}\.html$/);
       if (av && +av[1] >= 1 && +av[1] <= 114) return Response.redirect(url.origin + "/surah/" + av[1] + ".html", 301);
+      // a passage that no longer exists (content changed) → its first verse (which itself falls back to the surah)
+      const pg = r.status === 404 && url.pathname.match(/^\/passage\/(\d{1,3})-(\d{1,3})-\d{1,3}\.html$/);
+      if (pg && +pg[1] >= 1 && +pg[1] <= 114) return Response.redirect(url.origin + "/ayah/" + pg[1] + "-" + pg[2] + ".html", 301);
       if (r.status !== 404 || /\.[a-z0-9]+$/i.test(url.pathname)) return r;
       // old pretty URLs (/ayah/2-255, /en) → canonical .html or directory
       for (const alt of [url.pathname + ".html", url.pathname + "/index.html"]) {
