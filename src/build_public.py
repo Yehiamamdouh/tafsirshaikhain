@@ -150,54 +150,119 @@ urls=['/','/about.html','/privacy.html']
 pages={(s,v) for s in range(1,115) for k in ('summ','nuq') for a in ('IT','IQ') for v in map(int,SUR[s].get(k,{}).get(a,{})) if v>=1}
 THIN=120; THIN_N=[]
 BOOKS={}   # slug -> {'b':book,'v':set((s,v))}
+# passages (content session's src/make_groups.py -> public/groups.json): consecutive verses sharing one excerpt get one
+# page /passage/S-A-B.html; the single verse pages inside stay, with their canonical pointing at the passage
+if os.path.exists(T+'/make_groups.py'):
+    import subprocess; subprocess.run([sys.executable,T+'/make_groups.py',REPO],check=True,stdout=subprocess.DEVNULL)
+GROUPS=json.load(open(P+'/groups.json')) if os.path.exists(P+'/groups.json') else []
+GOF={}
+for g in GROUPS:
+    if all((g['su'],v) in pages for v in range(g['from'],g['to']+1)):
+        for v in range(g['from'],g['to']+1): GOF[(g['su'],v)]=(g['from'],g['to'])
+def curl(c,w):
+    g=GOF.get((c,w)); return f'/passage/{c}-{g[0]}-{g[1]}.html' if g else f'/ayah/{c}-{w}.html'
+shutil.rmtree(P+'/passage',ignore_errors=True)
+METH='<p class="meth">كلام الإمامين منقول بنصه من كتبهما مع الإحالة إلى الجزء والصفحة، ومطابَق آليًا مع أصله. <a href="/about.html">منهج العمل والمصادر</a></p>'
+def sections(d,s,vs,books=True):
+    """the imams' sections for one verse or a passage (an excerpt repeated across its verses is shown once)"""
+    parts=[]; first=''; firsta=''; rel=[]; who=[]
+    for a in ('IT','IQ'):
+        pts=[]; nq=[]; seen=set()
+        for v in vs:
+            for x in d.get('summ',{}).get(a,{}).get(str(v),[]):
+                if ('s',x['t']) not in seen: seen.add(('s',x['t'])); pts.append(x)
+            for x in d.get('nuq',{}).get(a,{}).get(str(v),[]):
+                k=('n',x.get('who',''),x['t'])
+                if k not in seen: seen.add(k); nq.append(x)
+            if books:
+                for x in d.get('summ',{}).get(a,{}).get(str(v),[])+d.get('nuq',{}).get(a,{}).get(str(v),[]):
+                    b=d['books'][x['b']]; BOOKS.setdefault(bslug(b),{'b':b,'v':set()})['v'].add((s,v))
+        if not pts and not nq: continue
+        who.append(a)
+        sec=f'<section><h2>{IMAM[a]}</h2>'
+        for x in pts:
+            if not first: first,firsta=fx(x['t'],False),a
+            rel+=cited(x['t'])
+            sec+=f'<blockquote>{fx(E(x["t"]))}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+        if nq:
+            sec+='<h3>ما نقله عن غيره</h3>'
+            for x in nq:
+                sec+=f'<blockquote><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{fx(E(x["t"]))}»'+(f'<br><b>تعقيبه:</b> {fx(E(x["rt"]))}' if x.get('rt') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+        sec+=full_html(d,pts+nq)
+        # verses the source paragraphs are linked to (record "ay")
+        B=d.setdefault('_byid',{r['id']:r for r in d['recs']})
+        for x in pts+nq:
+            try: r=B.get(int(x.get('r')))
+            except (TypeError,ValueError): r=None
+            if r and len(r.get('ay') or [])<=8: rel+=[(s,w) for w in r['ay'] if w]   # skip paragraphs about a whole surah
+        parts.append(sec+'</section>')
+    rel=[r for r in dict.fromkeys(rel) if not (r[0]==s and r[1] in vs)]
+    relh=''
+    if rel:
+        relh='<section><h3>آيات متصلة في كلام الإمامين هنا</h3><div class="rel">'+''.join(
+            (f'<a href="{curl(c,w)}">' if (c,w) in pages else '<span>')+f'{E(NAMES[c-1])} {AR(w)}'+('</a>' if (c,w) in pages else '</span>') for c,w in rel[:30])+'</div></section>'
+    return parts,first,firsta,relh,who
+def nav_of(s,have,lo,hi):
+    prv=max([w for w in have if w<lo],default=None); nxt=min([w for w in have if w>hi],default=None)
+    lab=lambda w: (f'الآيات {AR(GOF[(s,w)][0])}–{AR(GOF[(s,w)][1])}' if (s,w) in GOF else f'الآية {AR(w)}')
+    return '<div class="pn">'+(f'<a href="{curl(s,prv)}">→ {lab(prv)}</a>' if prv else '<span></span>')+(f'<a href="{curl(s,nxt)}">{lab(nxt)} ←</a>' if nxt else '')+'</div>'
+def words_of(body):
+    return len(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b.*?</\1>','',re.search(r'<main\b.*?</main>',body,re.S).group(0),flags=re.S)).split())
+PASS_N=0
 for s in range(1,115):
     d=SUR[s]; name=NAMES[s-1]; verses=[v['text'] for v in Q[str(s)]]
     have=sorted(v for (ss,v) in pages if ss==s)
     for v in have:
-        parts=[]; first=''; firsta=''; rel=[]; who=[]
-        for a in ('IT','IQ'):
-            pts=d.get('summ',{}).get(a,{}).get(str(v),[]); nq=d.get('nuq',{}).get(a,{}).get(str(v),[])
-            if not pts and not nq: continue
-            who.append(a)
-            sec=f'<section><h2>{IMAM[a]}</h2>'
-            for x in pts:
-                if not first: first,firsta=fx(x['t'],False),a
-                rel+=cited(x['t'])
-                sec+=f'<blockquote>{fx(E(x["t"]))}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
-            if nq:
-                sec+='<h3>ما نقله عن غيره</h3>'
-                for x in nq:
-                    sec+=f'<blockquote><span class="who">{E(x.get("who",""))}</span> <span class="st">{E(x.get("st",""))}</span><br>«{fx(E(x["t"]))}»'+(f'<br><b>تعقيبه:</b> {fx(E(x["rt"]))}' if x.get('rt') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
-            sec+=full_html(d,pts+nq)
-            for x in pts+nq:
-                b=d['books'][x['b']]; BOOKS.setdefault(bslug(b),{'b':b,'v':set()})['v'].add((s,v))
-            parts.append(sec+'</section>')
-        rel=[r for r in dict.fromkeys(rel) if r!=(s,v)]
-        relh=''
-        if rel:
-            relh='<section><h3>آيات ذكرها في كلامه هنا</h3><div class="rel">'+''.join(
-                (f'<a href="/ayah/{c}-{w}.html">' if (c,w) in pages else '<span>')+f'{E(NAMES[c-1])} {AR(w)}'+('</a>' if (c,w) in pages else '</span>') for c,w in rel[:24])+'</div></section>'
+        parts,first,firsta,relh,who=sections(d,s,[v])
         vt=verses[v-1]; pw=plain(vt).split(); short=' '.join(pw[:5])+('…' if len(pw)>5 else '')
         fam=FAMOUS.get((s,v))
         title=f'تفسير {fam or short} ({name} {v}) — ابن تيمية وابن القيم'
         lead=f'تفسير سورة {name} الآية {v}: '
         desc=(lead+((('قال ابن تيمية: ' if firsta=='IT' else 'قال ابن القيم: ')+first) if first else f'﴿{plain(vt)}﴾ بكلام ابن تيمية وابن القيم'))[:155]
-        i=have.index(v); prv=have[i-1] if i>0 else None; nxt=have[i+1] if i+1<len(have) else None
-        nav='<div class="pn">'+(f'<a href="/ayah/{s}-{prv}.html">→ الآية {AR(prv)}</a>' if prv else '<span></span>')+(f'<a href="/ayah/{s}-{nxt}.html">الآية {AR(nxt)} ←</a>' if nxt else '')+'</div>'
+        g=GOF.get((s,v))
+        note=(f'<p class="pnote">هذه الآية من مقطع شرحه الإمام بكلام واحد: <a href="/passage/{s}-{g[0]}-{g[1]}.html">تفسير الآيات {AR(g[0])}–{AR(g[1])} معًا</a></p>' if g else '')
         body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآية {AR(v)}</nav>'
-              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+''.join(parts)+'<p class="meth">كلام الإمامين منقول بنصه من كتبهما مع الإحالة إلى الجزء والصفحة، ومطابَق آليًا مع أصله. <a href="/about.html">منهج العمل والمصادر</a></p>'+muy_html(s,v)+relh+
-              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav+'</main>'+'<script src="/share.js"></script>')
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآية {AR(v)}'+(f' — {E(fam)}' if fam else '')+f'</h1><p class="vt">﴿{E(vt)}﴾</p>'+note+''.join(parts)+METH+muy_html(s,v)+relh+
+              f'<a class="btn pri open" href="/tafsir.html#s{s}a{v}">افتح الآية في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav_of(s,have,v,v)+'</main>'+'<script src="/share.js"></script>')
         ld={"@context":"https://schema.org","@graph":[
             {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+f'/ayah/{s}-{v}.html',
              "mainEntityOfPage":BASE+f'/ayah/{s}-{v}.html',"image":BASE+"/og.png","about":f"سورة {name}، الآية {v}",
              "author":[AUTH[a] for a in who],"isPartOf":{"@id":BASE+"/#site"},"publisher":{"@id":BASE+"/#org"}},
             crumbs_ld([('الرئيسية','/'),(f'سورة {name}',f'/surah/{s}.html'),(f'الآية {v}',f'/ayah/{s}-{v}.html')])]}
-        html_=page(title,desc,f'/ayah/{s}-{v}.html',body,ld)
-        # very short verse pages stay readable but out of search engines until the site's standing recovers (Nov 2026)
-        words=len(re.sub(r'<[^>]+>',' ',re.sub(r'<(script|style)\b.*?</\1>','',re.search(r'<main\b.*?</main>',body,re.S).group(0),flags=re.S)).split())
-        if words<THIN: html_=html_.replace('<link rel="canonical"','<meta name="robots" content="noindex,follow">\n<link rel="canonical"',1); THIN_N.append(f'{s}-{v}')
-        else: urls.append(f'/ayah/{s}-{v}.html')
+        if g:   # canonical -> the passage page; the passage is what goes in the sitemap
+            html_=page(title,desc,f'/passage/{s}-{g[0]}-{g[1]}.html',body,ld)
+        else:
+            html_=page(title,desc,f'/ayah/{s}-{v}.html',body,ld)
+            # very short verse pages stay readable but out of search engines until the site's standing recovers (Nov 2026)
+            if words_of(body)<THIN: html_=html_.replace('<link rel="canonical"','<meta name="robots" content="noindex,follow">\n<link rel="canonical"',1); THIN_N.append(f'{s}-{v}')
+            else: urls.append(f'/ayah/{s}-{v}.html')
         write(f'ayah/{s}-{v}.html',html_)
+    for (gs,lo),hi in sorted({(k[0],gv[0]):gv[1] for k,gv in GOF.items() if k[0]==s}.items()):
+        vs=list(range(lo,hi+1)); parts,first,firsta,relh,who=sections(d,s,vs,books=False)
+        pw=plain(verses[lo-1]).split(); short=' '.join(pw[:5])+('…' if len(pw)>5 else '')
+        fam=next((FAMOUS[(s,w)] for w in vs if (s,w) in FAMOUS),None)
+        title=f'تفسير {fam or short} ({name} {lo}–{hi}) — ابن تيمية وابن القيم'
+        desc=(f'تفسير سورة {name} الآيات {lo}–{hi}: '+((('قال ابن تيمية: ' if firsta=='IT' else 'قال ابن القيم: ')+first) if first else ''))[:155]
+        vts=''.join(f'<p class="vt">﴿{E(verses[w-1])}﴾ <span class="vn">({AR(w)})</span></p>' for w in vs)
+        mrows=[]   # one Muyassar box for the passage; identical consecutive texts are merged under one verse range
+        for w in vs:
+            r=MYD['verses'][str(s)].get(str(w)) or {}
+            if not r.get('text'): continue
+            if mrows and mrows[-1][2]==r['text'] and mrows[-1][1]==w-1: mrows[-1][1]=w
+            else: mrows.append([w,w,r['text'],r.get('footnotes')])
+        muys=('<div class="muy"><div class="muy-head"><b>التفسير الميسر</b><small>المعنى الإجمالي للآيات من «التفسير الميسر»، وليس من كلام الشيخين</small></div>'
+              +''.join(f'<p class="muy-text"><b>({AR(a_)}'+(f'–{AR(b_)}' if b_!=a_ else '')+f')</b> {E(t_)}</p>'+(f'<p class="muy-fn">{E(fn_)}</p>' if fn_ else '') for a_,b_,t_,fn_ in mrows)
+              +f'<a class="muy-credit" href="https://quranenc.com/ar/browse/arabic_moyassar" target="_blank" rel="noopener">التفسير الميسر، مجمع الملك فهد لطباعة المصحف الشريف — الإصدار {E(MYD["edition"]["version"])} · QuranEnc.com</a></div>') if mrows else ''
+        vlinks='<p class="pnote">الآيات منفردة: '+' · '.join(f'<a href="/ayah/{s}-{w}.html">الآية {AR(w)}</a>' for w in vs)+'</p>'
+        path=f'/passage/{s}-{lo}-{hi}.html'
+        body=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › <a href="/surah/{s}.html">سورة {E(name)}</a> › الآيات {AR(lo)}–{AR(hi)}</nav>'
+              f'<h1>تفسير قوله تعالى في سورة {E(name)}، الآيات {AR(lo)}–{AR(hi)}'+(f' — {E(fam)}' if fam else '')+f'</h1>{vts}'+''.join(parts)+METH+muys+relh+vlinks+
+              f'<a class="btn pri open" href="/tafsir.html#s{s}a{lo}">افتح الآيات في التفسير التفاعلي (كل النصوص والنقول)</a>'+nav_of(s,have,lo,hi)+'</main>'+'<script src="/share.js"></script>')
+        ld={"@context":"https://schema.org","@graph":[
+            {"@type":"Article","headline":title[:110],"description":desc,"inLanguage":"ar","url":BASE+path,"mainEntityOfPage":BASE+path,"image":BASE+"/og.png",
+             "about":f"سورة {name}، الآيات {lo}–{hi}","author":[AUTH[a] for a in who],"isPartOf":{"@id":BASE+"/#site"},"publisher":{"@id":BASE+"/#org"}},
+            crumbs_ld([('الرئيسية','/'),(f'سورة {name}',f'/surah/{s}.html'),(f'الآيات {lo}–{hi}',path)])]}
+        write(path[1:],page(title,desc,path,body,ld)); urls.append(path); PASS_N+=1
     def lead_of(v):
         for a in ('IT','IQ'):
             l=d.get('summ',{}).get(a,{}).get(str(v),[])
@@ -205,7 +270,7 @@ for s in range(1,115):
                 t=fx(l[0]['t'],False); cut=t if len(t)<=220 else t[:220].rsplit(' ',1)[0]+'…'
                 return f'<p class="vsum"><b>{"ابن تيمية" if a=="IT" else "ابن القيم"}:</b> {E(cut)}</p>'
         return ''
-    vl=''.join(f'<div class="vitem"><a class="vrow" href="/ayah/{s}-{v}.html"><b>{AR(v)}</b> <span>{E(" ".join(verses[v-1].split()[:8]))}…</span></a>{lead_of(v)}</div>' for v in have)
+    vl=''.join(f'<div class="vitem"><a class="vrow" href="{curl(s,v)}"><b>{AR(v)}</b> <span>{E(" ".join(verses[v-1].split()[:8]))}…</span></a>{lead_of(v)}</div>' for v in have)
     sp=(style+f'<main class="sp"><nav class="crumbs"><a href="/">الرئيسية</a> › سورة {E(name)}</nav><h1>تفسير سورة {E(name)} عند ابن تيمية وابن القيم</h1>'
         f'<section><p>الآيات التي جُمع فيها كلام الشيخين من سورة {E(name)} ({AR(len(have))} من {AR(len(verses))} آية):</p><div class="vrows">{vl or "—"}</div></section>'
         f'<a class="btn pri open" href="/tafsir.html#s{s}a{1 if s>1 else 0}">افتح السورة في التفسير التفاعلي</a></main>')
@@ -272,6 +337,6 @@ for s in range(1,115):
     json.dump(rows,open(f'{P}/tr/muyassar/{s}.json','w'),ensure_ascii=False,separators=(',',':'))
 json.dump({'title':ed['name'],'credit':'التفسير الميسر، مجمع الملك فهد لطباعة المصحف الشريف','version':ed['version'],
            'url':'https://quranenc.com/ar/browse/arabic_moyassar','transcript':ed.get('transcript','')},open(P+'/tr/muyassar/meta.json','w'),ensure_ascii=False)
-print('thin verse pages (noindex):',len(THIN_N))
+print('thin verse pages (noindex):',len(THIN_N),'passages:',PASS_N)
 print('built; pages',len(urls),'stats',stats)
 import subprocess; subprocess.run([sys.executable,T+'/build_langs.py',REPO],check=True)
