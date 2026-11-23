@@ -406,7 +406,7 @@ function imamBlock(S, a, v){
 function pointEl(S, pt){
   const li = document.createElement('li'); li.className = 'pt';
   const label = () => shortRef(S, pt.b, pt.v, pt.p);
-  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p>' + (pt.cx ? '<p class="pcx">' + esc(pt.cx) + '</p>' : '') + '<button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
+  li.innerHTML = '<div class="pt-body"><p class="quote">' + highlight(pt.t, []) + '</p>' + (pt.cx ? '<p class="pcx">' + (window.edfix ? edfix(esc(pt.cx)) : esc(pt.cx)) + '</p>' : '') + '<button type="button" class="cite" aria-expanded="false">' + esc(label()) + ' · اقرأ الفقرة كاملة</button></div>';
   const btn = li.querySelector('.cite');
   btn.addEventListener('click', () => {
     let full = li.querySelector('.full');
