@@ -183,7 +183,7 @@ def sections(d,s,vs,books=True):
         for x in pts:
             if not first: first,firsta=fx(x['t'],False),a
             rel+=cited(x['t'])
-            sec+=f'<blockquote>{fx(E(x["t"]))}'+(f'<small class="pcx">{E(x["cx"])}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
+            sec+=f'<blockquote>{fx(E(x["t"]))}'+(f'<small class="pcx">{fx(E(x["cx"]))}</small>' if x.get('cx') else '')+f'<cite>{ref(d,x)}</cite></blockquote>'
         if nq:
             sec+='<h3>ما نقله عن غيره</h3>'
             for x in nq:

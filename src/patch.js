@@ -277,11 +277,14 @@ render = function(){
 };
 
 // ---- display-only clean-up of edition artifacts in the imams' texts (data unchanged; mirrors src/edfix.py) ----
-// 1) a verse reference repeated right after itself -> keep the first; 2) a footnote number glued to an Arabic word
+// 1) a verse reference repeated right after itself -> keep the first; 1b) manuscript page marks /54ب/ and 1-2 digit
+// footnote numbers right after ] or } -> dropped; 2) a footnote number glued to an Arabic word
 // outside [...] -> dropped; 3) editor additions [..] without digits -> faint with a tooltip. Verse refs stay as they are.
 function edfix(t, span){
   t = String(t).replace(/(\[([^\]\[\d:<>]+?):?\s*(\d+)\])\s*\[\s*\2:?\s*\3\]/g, '$1');
-  t = t.split(/(\[[^\[\]]*\])/).map((p, i) => i % 2 ? p : p.replace(/([ء-ي])(\d{1,3})(?=[\s،,.؛:!؟?»"'&<]|$)/g, '$1')).join('');
+  t = t.replace(/\s?\/\s*\d{1,4}\s*[أاب]\s*\//g, '');
+  t = t.replace(/([\]}])((?:<\/[a-z]+>)*)\s?\d{1,2}(?![\d\/])/g, '$1$2');
+  t = t.split(/(\[[^\[\]]*\])/).map((p, i) => i % 2 ? p : p.replace(/([ء-ي])(\d{1,2})(?=[\s،,.؛:!؟?»"'&<]|$)/g, '$1')).join('');
   if (span !== false) t = t.replace(/\[([^\[\]\d<>{}]+)\]/g, '<span class="tz" title="زيادة من المحقق">[$1]</span>');
   return t;
 }
